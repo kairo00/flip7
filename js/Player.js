@@ -1,28 +1,48 @@
 const IA_LEVELS = [1, 2];
 
-export class player{
+export class Player{
     //Classe pour instancier les objets player
     #pseudo;
     #hand;
     #canPlay;
     constructor(pseudo){
-        if (this.constructor === player) {
-            throw new TypeError('Abstract class "player" cannot be instantiated directly');
+        if (this.constructor === Player) {
+            throw new TypeError('Abstract class "Player" cannot be instantiated directly');
         }
         this.#pseudo = pseudo;
         this.#hand = [];
         this.#canPlay = true;
     }
 
+    getPseudo(){
+        return this.#pseudo;
+    }
+
+    getHand(){
+        return this.#hand;
+    }
+
+    setHand(hand){
+        this.#hand = hand;
+    }
+
+    getCanPlay(){
+        return this.#canPlay;
+    }
+
+    setCanPlay(canPlay){
+        this.#canPlay = canPlay;
+    }
+
 }
 
-export class HumanPlayer extends player{
+export class HumanPlayer extends Player{
     constructor(pseudo){
         super(pseudo);
     }
 }
 
-export class ComputerPlayer extends player{ 
+export class ComputerPlayer extends Player{ 
     #niveau;
     constructor(pseudo, niveau){
         super(pseudo);
