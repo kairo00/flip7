@@ -7,6 +7,7 @@ export class Board{
     #pile;
     #round;
     #currentPlayer;
+    #roundStartPlayer;
     constructor(players){
         this.#players = players;
         this.#scores = [];
@@ -14,6 +15,7 @@ export class Board{
         this.#pile = [];
         this.#round = 0;
         this.#currentPlayer = 0;
+        this.#roundStartPlayer = -1;
     }
 
     shuffleDeck(){
@@ -60,6 +62,7 @@ export class Board{
     resetRound(){
         this.#round += 1;
         this.#pile = [];
+        console.log(`Début du round ${this.#round}`);
     }
 
     #checkWin(){
@@ -72,45 +75,138 @@ export class Board{
     }
 
     start(){
-        console.log("Le jeu commence !");
         this.createDeck();
-        for (let i = 0; i < this.#players.length; i++) {
-            this.#scores.push(0);
-        }
-        this.#currentPlayer = Math.floor(Math.random() * (this.#players.length));
-        let end = 0;
-        while(!this.#checkWin() && end < 5){
-            this.resetRound();
-            this.#startRound();
-            end++;
-        }
-        
+        this.#scores = new Array(this.#players.length).fill(0);
+        this.#currentPlayer = Math.floor(Math.random() * this.#players.length);
+        this.#roundStartPlayer = this.#currentPlayer;
+        this.#round = 1;
+        this.#pile = [];
     }
 
-    #tirerCarte(input){
-        if(input !== null && input.toUpperCase() === "T"){
-                let card = this.#deck.pop();
-                
-                console.log("Vous avez tiré la carte : " + card.getNumero() + " " + card.getNom());
-                this.#players[this.#currentPlayer].getHand().push(card);
-                return card;
-        }
-        return null;
+    getCurrentPlayer(){
+        return this.#players[this.#currentPlayer];
     }
 
+    getPlayers(){
+        return [...this.#players];
+    }
 
-    #startRound(){
-        for(let i = 0; i < this.#players.length; i++){
-            console.log("C'est au tour de " + this.#players[this.#currentPlayer].getPseudo());
-            let input = prompt("Tirer ou STOP ? (T/S)");
-            let card = this.#tirerCarte(input);
+    getDeckCount(){
+        return this.#deck.length;
+    }
 
-            if(card === null){
-                break;
+    getState(){
+        return {
+            players: this.#players.map(player => ({
+                pseudo: player.getPseudo(),
+                hand: [...player.getHand()],
+                canPlay: player.getCanPlay()
+            })),
+            scores: [...this.#scores],
+            currentPlayerIndex: this.#currentPlayer,
+            currentPlayerPseudo: this.getCurrentPlayer().getPseudo(),
+            round: this.#round,
+            deckCount: this.getDeckCount(),
+            pile: [...this.#pile],
+            gameOver: this.#checkWin(),
+        };
+    }
+
+    playAction(action){
+        const normalized = typeof action === 'string' ? action.toUpperCase() : '';
+
+        if(normalized === "T"){
+            const result = this.#tirerCarte();
+            if(result.status !== 'continue'){
+                this.nextPlayer();
+                if(this.#currentPlayer === this.#roundStartPlayer){
+                    this.#calculateScores();
+                    this.resetRound();
+                }
             }
+            return result;
+        }
+
+        if(normalized === "S"){
             this.nextPlayer();
+            if(this.#currentPlayer === this.#roundStartPlayer){
+                this.#calculateScores();
+                this.resetRound();
+            }
+            return { status: 'stopped' };
+        }
+
+        throw new RangeError('Action must be "T" or "S".');
+    }
+
+    #viderDeck(player){
+        for(const card of player.getHand()){
+            this.#pile.push(card);
+        }
+        player.setHand([]);
+    }
+
+    #calculateScores(){
+        for(let i = 0; i < this.#players.length; i++){
+            const player = this.#players[i];
+            let points = 0;
+            for(const card of player.getHand()){
+                if(card instanceof NumberCard){
+                    points += card.getNumero();
+                }
+            }
+            this.#scores[i] += points;
+            console.log(`${player.getPseudo()} gagne ${points} points. Score total: ${this.#scores[i]}`);
+        }
+        // Vider les mains après comptage
+        for(const player of this.#players){
+            this.#viderDeck(player);
         }
     }
-    
-    
+
+    #checkFlip7(player){
+        if(player.getHand().length >= 7){
+            let count = 0;
+            for(const card of player.getHand()){
+                if(card instanceof NumberCard){
+                    count++;
+                }
+            }
+            return count >= 7;
+        }
+        return false;
+    }
+
+    #checkTooMuchCards(player, card){
+        for (const c of player.getHand()){
+            if(c instanceof NumberCard && c.getNumero() == card.getNumero()){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    #tirerCarte(){
+        if(this.#deck.length === 0){
+            return { status: 'empty' };
+        }
+
+        const card = this.#deck.pop();
+        const player = this.#players[this.#currentPlayer];
+
+        console.log("Vous avez tiré la carte : " + card.getNumero() + " " + card.getNom());
+
+        if(this.#checkTooMuchCards(player, card)){
+            console.log("Vous avez déjà une carte " + card.getNumero() + " dans votre main !");
+            return { status: 'duplicate', card };
+        }
+
+        player.getHand().push(card);
+        if (this.#checkFlip7(player)) {
+            return { status: 'flip7', card };
+        }
+
+        return { status: 'continue', card };
+    }
 }
+
