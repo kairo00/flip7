@@ -1,6 +1,6 @@
-import {Cards, NumberCard, BonusCard, SpecialCard} from "./Cards.js";
+import { Cards, NumberCard, BonusCard, SpecialCard } from "./Cards.js";
 
-export class Board{
+export class Board {
     #players;
     #scores;
     #deck;
@@ -8,7 +8,7 @@ export class Board{
     #round;
     #currentPlayer;
     #roundStartPlayer;
-    constructor(players){
+    constructor(players) {
         this.#players = players;
         this.#scores = [];
         this.#deck = [];
@@ -18,20 +18,20 @@ export class Board{
         this.#roundStartPlayer = -1;
     }
 
-    shuffleDeck(){
-        for(let i = this.#deck.length - 1; i > 0; i--){
+    shuffleDeck() {
+        for (let i = this.#deck.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [this.#deck[i], this.#deck[j]] = [this.#deck[j], this.#deck[i]];
         }
     }
 
 
-    createDeck(){
+    createDeck() {
         let deck = [];
 
         //cartes number
-        for(let i = 12; i >= 0 ; i--){
-            for(let j = 1; j <= i ; j++){
+        for (let i = 4; i >= 0; i--) {
+            for (let j = 1; j <= i; j++) {
                 deck.push(new NumberCard(i));
             }
         }
@@ -51,30 +51,29 @@ export class Board{
             deck.push(new SpecialCard('STOP'));
             deck.push(new SpecialCard('TROISALASUITE'));
         }
-       this.#deck = deck;
-       this.shuffleDeck();
+        this.#deck = deck;
+        this.shuffleDeck();
     }
 
-    nextPlayer(){
+    nextPlayer() {
         this.#currentPlayer = (this.#currentPlayer + 1) % this.#players.length;
     }
 
-    resetRound(){
+    resetRound() {
         this.#round += 1;
-        this.#pile = [];
         console.log(`Début du round ${this.#round}`);
     }
 
-    #checkWin(){
-        for(let i = 0; i < this.#players.length; i++){
-            if(this.#scores[i] >= 200){
+    #checkWin() {
+        for (let i = 0; i < this.#players.length; i++) {
+            if (this.#scores[i] >= 200) {
                 return true;
             }
         }
         return false;
     }
 
-    start(){
+    start() {
         this.createDeck();
         this.#scores = new Array(this.#players.length).fill(0);
         this.#currentPlayer = Math.floor(Math.random() * this.#players.length);
@@ -83,19 +82,19 @@ export class Board{
         this.#pile = [];
     }
 
-    getCurrentPlayer(){
+    getCurrentPlayer() {
         return this.#players[this.#currentPlayer];
     }
 
-    getPlayers(){
+    getPlayers() {
         return [...this.#players];
     }
 
-    getDeckCount(){
+    getDeckCount() {
         return this.#deck.length;
     }
 
-    getState(){
+    getState() {
         return {
             players: this.#players.map(player => ({
                 pseudo: player.getPseudo(),
@@ -112,63 +111,65 @@ export class Board{
         };
     }
 
-    playAction(action){
+    playAction(action) {
         const normalized = typeof action === 'string' ? action.toUpperCase() : '';
 
-        if(normalized === "T"){
+        if (normalized === "T") {
             const result = this.#tirerCarte();
-            if(result.status !== 'continue'){
+            if (result.status !== 'continue' && result.status !== 'empty') {
                 this.nextPlayer();
-                if(this.#currentPlayer === this.#roundStartPlayer){
+                if (this.#currentPlayer === this.#roundStartPlayer) {
                     this.#calculateScores();
                     this.resetRound();
                 }
             }
+            console.log(`Après action T - Pile: ${this.#pile.length}, status: ${result.status}`);
             return result;
         }
 
-        if(normalized === "S"){
+        if (normalized === "S") {
             this.nextPlayer();
-            if(this.#currentPlayer === this.#roundStartPlayer){
+            if (this.#currentPlayer === this.#roundStartPlayer) {
                 this.#calculateScores();
                 this.resetRound();
             }
+            console.log(`Après action S - Pile: ${this.#pile.length}`);
             return { status: 'stopped' };
         }
 
         throw new RangeError('Action must be "T" or "S".');
     }
 
-    #viderDeck(player){
-        for(const card of player.getHand()){
+    #viderDeck(player) {
+        for (const card of player.getHand()) {
             this.#pile.push(card);
         }
         player.setHand([]);
     }
 
-    #calculateScores(){
-        for(let i = 0; i < this.#players.length; i++){
+    #calculateScores() {
+        for (let i = 0; i < this.#players.length; i++) {
             const player = this.#players[i];
             let points = 0;
-            for(const card of player.getHand()){
-                if(card instanceof NumberCard){
+            for (const card of player.getHand()) {
+                if (card instanceof NumberCard) {
                     points += card.getNumero();
                 }
             }
             this.#scores[i] += points;
             console.log(`${player.getPseudo()} gagne ${points} points. Score total: ${this.#scores[i]}`);
         }
-        // Vider les mains après comptage
-        for(const player of this.#players){
+        
+        for (const player of this.#players) {
             this.#viderDeck(player);
         }
     }
 
-    #checkFlip7(player){
-        if(player.getHand().length >= 7){
+    #checkFlip7(player) {
+        if (player.getHand().length >= 7) {
             let count = 0;
-            for(const card of player.getHand()){
-                if(card instanceof NumberCard){
+            for (const card of player.getHand()) {
+                if (card instanceof NumberCard) {
                     count++;
                 }
             }
@@ -177,17 +178,20 @@ export class Board{
         return false;
     }
 
-    #checkTooMuchCards(player, card){
-        for (const c of player.getHand()){
-            if(c instanceof NumberCard && c.getNumero() == card.getNumero()){
+    #checkTooMuchCards(player, card) {
+        for (const c of player.getHand()) {
+            if (c instanceof NumberCard && c.getNumero() == card.getNumero()) {
                 return true;
             }
         }
         return false;
     }
 
-    #tirerCarte(){
-        if(this.#deck.length === 0){
+    #tirerCarte() {
+        if (this.#deck.length === 0) {
+            this.#deck = [...this.#pile];
+            this.#pile = [];
+            this.shuffleDeck();
             return { status: 'empty' };
         }
 
@@ -196,7 +200,7 @@ export class Board{
 
         console.log("Vous avez tiré la carte : " + card.getNumero() + " " + card.getNom());
 
-        if(this.#checkTooMuchCards(player, card)){
+        if (this.#checkTooMuchCards(player, card)) {
             console.log("Vous avez déjà une carte " + card.getNumero() + " dans votre main !");
             return { status: 'duplicate', card };
         }

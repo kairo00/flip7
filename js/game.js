@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function(){
                 renderState("Carte déjà présente. Tour terminé.");
                 break;
             case "empty":
-                renderState("Le paquet est vide. Tour terminé.");
+                renderState("Le deck est vide. Deck reshufflé vous pouvez tirer une carte.");           
                 break;
             case "stopped":
                 renderState("Tour arrêté. Joueur suivant.");
