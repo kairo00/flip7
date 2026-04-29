@@ -3,10 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Flip 7</title>
     <script type="module" src="./js/game.js"></script>
 </head>
 <body>
-    <p>Hello World !</p>
+    <h1>Flip 7</h1>
+
+    <section id="game-board">
+        <p id="current-player">Joueur actif : </p>
+        <p id="deck-count">Cartes restantes : </p>
+        <p id="round">Round : </p>
+        <p id="scores">Scores : </p>
+        <p id="message"></p>
+
+        <div id="hand-area">
+            <h2>Votre main</h2>
+            <ul id="hand-list"></ul>
+        </div>
+
+        <div id="controls">
+            <button id="btn-tirer">Tirer</button>
+            <button id="btn-stoper">Stop</button>
+        </div>
+    </section>
 </body>
 </html>
