@@ -48,15 +48,15 @@ table {
 }
 
 html {
-  font-size: clamp(14px, 1.2vw, 18px);
-  /*               ↑ min  ↑ fluid  ↑ max */
+  font-size: 16px;
+  font-size: clamp(10px, 1.2vw, 18px);
 }
 
 /* font */
 
 @font-face {
   font-family: 'Uncut Sans';
-  src: url('./fonts/UncutSans.woff2') format('woff2');
+  src: url('../assets/fonts/UncutSans.woff2') format('woff2');
   font-weight: 300 700;
   font-style: normal;
   font-display: swap;
@@ -64,7 +64,7 @@ html {
 
 @font-face {
   font-family: 'Newake';
-  src: url('./fonts/Newake.woff2') format('woff2');
+  src: url('../assets/fonts/Newake.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -75,15 +75,15 @@ html {
 :root {
     /* Light theme */
     --color-bg-light: #000;
-    --gradient-light-theme: radial-gradient(71.53% 71.53% at 50% 19.87%, #E9F6FF 0%, var(--Primary, #C4E7FF) 82.69%, #C4E7FF 100%);;
+    --gradient-light-theme: radial-gradient(71.53% 71.53% at 50% 19.87%, #E9F6FF 0%, var(--Primary, #C4E7FF) 82.69%, #C4E7FF 100%);
 
-    --primary-color: ;
-    --secondary-color: ;
+    --primary-color: #C4E7FF;
+    --secondary-color: #FFBCF2;
 
     --dark-blue-color: #02090E;
     --marine-blue-color: #061A27;
     --frost-white-color: #E9F6FF;
-    --white-color: ;
+    --white-color: #FFFFFF;
 
     /* Dark theme */
     --color-bg-dark: #000;
@@ -92,6 +92,7 @@ html {
 
 /*style general*/
 
+/* Pour appliquer la font à tout les textes de la page */
 *, *::before, *::after {
     font-family: inherit;
 }
@@ -103,6 +104,7 @@ body {
     font-family: 'Uncut Sans', sans-serif;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 header {
@@ -121,12 +123,63 @@ header {
       width: 80vh;
       top: -40px;
       pointer-events: none;
-      z-index: 0;
+      z-index: -1;
       opacity: 0.4;
       mix-blend-mode: multiply;
 }
 
-/*section home*/
+/*  Boutons du jeu */
+
+
+button {
+    cursor: pointer;
+    box-shadow: 0 4px 0 0 #000;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    box-shadow: 0 0px 0 0 #000; /* ombre disparaît */
+    transform: translateY(4px); /* descend du même écart */
+}
+
+.primary-btn {
+    display: flex;
+    padding: 0.7em 3em;
+    border-radius: 2rem 2rem 1.6875rem 1.6875rem;
+    border: 0.1em solid var(--dark-blue-color);
+    background: radial-gradient(50% 50% at 50% 50%, #FFBCF2 0%, #FF9DEC 100%);
+    box-shadow: 0 6px 0 0 var(--dark-blue-color);
+    font-weight: 700;
+    font-size: 1.7rem;
+    gap: 1rem;
+    align-items: center;
+}
+
+.play {
+    margin-bottom: 80px;
+}
+
+.secondary-btn {
+    display: flex;
+    padding: 0.7em 3em;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 500;
+    font-size: 1.4rem;
+    border-radius: 2rem 2rem 1.6rem 1.6rem;
+    border: 0.1em solid var(--dark-blue-color);
+    background: var(--marine-blue-color);
+    box-shadow: 0 6px 0 0 var(--dark-blue-color);
+    color: var(--white-color);
+}
+
+.secondary-btn svg {
+    height: 24px;
+}
+
+/* CSS de la section home */
+
 #view-home {
     flex: 1;
     display: flex;
@@ -134,6 +187,25 @@ header {
     align-items: center;
     justify-content: space-between;
 }
+
+#cta-section {
+    position: relative;
+    margin-top: 7vh;
+    text-align: center;
+}
+
+#cta-title {
+    color: var(--marine-blue-color);
+    font-weight: 700;
+    font-size: 8rem;
+    letter-spacing: -0.32rem;
+    margin-bottom: 1.5rem;
+}
+
+#cta-text {
+    font-size: 1.5rem;
+}
+
 .nav-container {
     position: relative;
     width: 100%;
@@ -145,120 +217,90 @@ header {
     bottom: 0;
     left: 0;
     z-index: -10;
+    position: absolute;
 }
 
 .buttons {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   padding: 0 5%;
-  margin-top: -80px;
+  margin-bottom: 30px;
   position: relative;   /* pour le z-index */
-  z-index: 1;
-}
-
-.primary-btn {
-    display: flex;
-    padding: 1rem 3rem;
-    border-radius: 2rem 2rem 1.6875rem 1.6875rem;
-    border: 3px solid var(--dark-blue-color);
-    background: radial-gradient(50% 50% at 50% 50%, #FFBCF2 0%, #FF9DEC 100%);
-    box-shadow: 0 6px 0 0 #02090E;
-}
-
-.secondary-btn {
-    display: flex;
-    padding: 1.5625rem 3.3125rem;
-    justify-content: center;
-    align-items: center;
-    gap: 0.625rem;
-    border-radius: 2rem 2rem 1.6875rem 1.6875rem;
-    border: 3px solid var(--Dark-Blue, #02090E);
-    background: var(--Marine-Blue, #061A27);
-    box-shadow: 0 6px 0 0 #02090E;
-    color: var(--frost-white-color);
 }
 
 #add-player {
     display: flex;
-    padding: 1.00013rem 1.52025rem;
+    padding: 0.7em 1em;
     align-items: center;
     gap: 0.40006rem;
     border-radius: 1.28019rem 1.28019rem 1.08019rem 1.08019rem;
-    border: 1.92px solid var(--Marine-Blue, #061A27);
+    border: 0.1em solid var(--marine-blue-color);
     font-variation-settings: "wght" 500;
     font-weight: 500;
-    font-size: 1.44019rem;
-    background: var(--White, #FFF);
+    font-size: 1.2rem;
+    background: var(--white-color);
 }
 
-button {
-    box-shadow: 0 4px 0 0 #000;
-    transition: box-shadow 0.3s ease, transform 0.2s ease;
+@keyframes levitation-1 {
+  0%   { transform: translateY(0px) rotate(-5deg); }
+  50%  { transform: translateY(-12px) rotate(-5deg); }
+  100% { transform: translateY(0px) rotate(-5deg); }
 }
 
-button:hover {
-    box-shadow: 0 0px 0 0 #000; /* ombre disparaît */
-    transform: translateY(4px); /* descend du même écart */
+@keyframes levitation-2 {
+  0%   { transform: translateY(0px) rotate(8deg); }
+  50%  { transform: translateY(-18px) rotate(8deg); }
+  100% { transform: translateY(0px) rotate(8deg); }
 }
 
-#cta-title {
-    font-weight: 700;
-    font-size: 5rem;
-    letter-spacing: -0.32rem;
+@keyframes levitation-3 {
+  0%   { transform: translateY(0px) rotate(-3deg); }
+  50%  { transform: translateY(-10px) rotate(-3deg); }
+  100% { transform: translateY(0px) rotate(-3deg); }
 }
 
-/* The switch - the box around the slider */
-.switch {
- font-size: 1rem;
- position: relative;
- display: inline-block;
- width: 4em;
- height: 2em;
+#cta-section img{
+    position: absolute;
 }
 
-/* Hide default HTML checkbox */
-.switch input {
- opacity: 0;
- width: 0;
- height: 0;
+#fg-card-1 {
+    width: 40%;
+    top: -2vh;
+    left: -20vw;
+    animation: levitation-1 4.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
-/* The slider */
-.slider {
- position: absolute;
- cursor: pointer;
- inset: 0;
- background-color: var(--marine-blue-color);
- border: 2.25px solid var(--dark-blue-color);
- transition: 0.4s;
- border-radius: 0.5em;
- box-shadow: 0 6px 0 0 #02090E;
+#fg-card-2 {
+    width: 15%;
+    top: 3vh;
+    right: -8vw;
+    animation: levitation-3 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    animation-delay: -2s;
 }
 
-.slider:before {
- position: absolute;
- content: "";
- height: 1.5em;
- width: 1.4em;
- border-radius: 0.3em;
- left: 0.3em;
- bottom: 0.7em;
- background-color: var(--frost-white-color);
- transition: 0.4s;
- box-shadow: 0 0.4em var(--dark-blue-color);
+#bg-card-1 {
+    width: 23%;
+    top: -10vh;
+    left: 10vw;
+    z-index: -1;
+    animation: levitation-2 5.7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    animation-delay: -1.2s;
 }
 
-.slider:hover::before {
- box-shadow: 0 0.2em var(--dark-blue-color);
- bottom: 0.5em;
+#bg-card-2 {
+    width: 20%;
+    bottom: -13vh;
+    right: 17vw;
+    z-index: -1;
+      animation: levitation-2 4.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation-delay: -1.2s;
 }
 
-input:checked+.slider:before {
- transform: translateX(2em);
- background: var(--marine-blue-color);
-}
-
-input:checked+.slider {
-    background-color: var(--frost-white-color);
+#bg-card-3 {
+    width: 27%;
+    top: -15vh;
+    right: 5vw;
+    z-index: -1;
+    animation: levitation-1 5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }

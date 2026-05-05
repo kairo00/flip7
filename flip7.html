@@ -12,17 +12,23 @@
     <header>
         <div id="logo-flip7"><img src="assets/images/logo-flip7.svg"></div>
         <div id="buttons-bar">
-            <label class="switch">
-                <input type="checkbox">
-                <span class="slider"></span>
-            </label>
+            <button class="secondary-btn theme-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
+                <path d="M10.2001 20.0133C14.7301 20.0133 18.6501 17.1033 19.9601 12.7733C20.0701 12.4233 19.9701 12.0333 19.7101 11.7733C19.4501 11.5133 19.0701 11.4133 18.7101 11.5233C17.9301 11.7533 17.1301 11.8733 16.3301 11.8733C11.8101 11.8733 8.13006 8.19327 8.13006 3.67327C8.13006 2.87327 8.25006 2.07327 8.48006 1.29327C8.53282 1.11958 8.53742 0.934829 8.49335 0.758738C8.44928 0.582647 8.3582 0.421834 8.22985 0.293479C8.10149 0.165124 7.94068 0.0740469 7.76459 0.0299776C7.5885 -0.0140916 7.40374 -0.009498 7.23006 0.043268C5.13369 0.676313 3.29765 1.96911 1.99501 3.7294C0.692361 5.48968 -0.00730837 7.62342 5.75689e-05 9.81327C5.75689e-05 15.4333 4.58006 20.0133 10.2001 20.0133Z" fill="#FFFFFF"/>
+                </svg>
+            </button>
         </div>
     </header>
 
     <section id="view-home">
         <div id="cta-section">
+            <img id="fg-card-1" src="assets/images/fg_card.webp">
+            <img id="fg-card-2" src="assets/images/back_card.webp">
             <h1 id="cta-title">C'est bien vide ici...</h1>
-            <p id="cta-text">bla bla</p>
+            <p id="cta-text">Pour commencer une partie veuillez ajouter au moins 3 joueurs.</p>
+            <img id="bg-card-1" src="assets/images/bg_card_four.webp">
+            <img id="bg-card-2" src="assets/images/bg_card_dix.webp">
+            <img id="bg-card-3" src="assets/images/bg_card_zero.webp">
         </div>
 
         <button id="add-player">
@@ -43,7 +49,7 @@
                     </svg>
                     Règles
                 </button>
-                <button class="primary-btn">
+                <button class="primary-btn play">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="22" viewBox="0 0 18 22" fill="none">
                         <path d="M17.2552 12.7764C17.1539 12.8803 16.7717 13.3246 16.4156 13.6901C14.3281 15.9888 8.88241 19.7513 6.03215 20.8998C5.59929 21.0843 4.50491 21.4749 3.9202 21.5C3.35992 21.5 2.82582 21.371 2.31616 21.1094C1.68083 20.7439 1.17117 20.1688 0.891906 19.4897C0.712129 19.0185 0.432862 17.6085 0.432862 17.5834C0.153596 16.0408 0 13.5342 0 10.7643C0 8.12521 0.153596 5.72079 0.382245 4.15487C0.408427 4.12979 0.687693 2.37754 0.99314 1.77733C1.55342 0.680833 2.64779 0 3.81896 0H3.9202C4.68294 0.026875 6.28698 0.707708 6.28698 0.732792C8.98364 1.88304 14.3037 5.461 16.4418 7.83854C16.4418 7.83854 17.044 8.4495 17.3058 8.83112C17.7142 9.37937 17.9167 10.0584 17.9167 10.7375C17.9167 11.4953 17.688 12.2013 17.2552 12.7764Z" fill="#02090E"/>
                     </svg>
@@ -62,7 +68,12 @@
         </div>
     </section>
     <section id="view-waitroom" style="display: none;"></section>
-    <section id="modal-rules" style="display: none;"></section>
+    <section id="modal-rules" style="display: none;">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <p>rules</p>
+        </div>
+    </section>
     <section id="modal-stats" style="display: none;"></section>
     <section id="modal-players" style="display: none;"></section>
     <section id="view-game" style="display: none;"></section>
