@@ -97,6 +97,10 @@ html {
     font-family: inherit;
 }
 
+.hidden {
+  display: none !important;
+}
+
 body {
     background: var(--gradient-light-theme);
     min-height: 100vh;
@@ -105,6 +109,7 @@ body {
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow-y: hidden;
 }
 
 header {
@@ -138,8 +143,8 @@ button {
 }
 
 button:hover {
-    box-shadow: 0 0px 0 0 #000; /* ombre disparaît */
-    transform: translateY(4px); /* descend du même écart */
+    box-shadow: 0 0px 0 0 #000;
+    transform: translateY(4px);
 }
 
 .primary-btn {
@@ -176,6 +181,10 @@ button:hover {
 
 .secondary-btn svg {
     height: 24px;
+}
+
+.theme-btn {
+    padding: 0.7em 0.8em;
 }
 
 /* CSS de la section home */
@@ -226,10 +235,10 @@ button:hover {
   align-items: center;
   padding: 0 5%;
   margin-bottom: 30px;
-  position: relative;   /* pour le z-index */
+  position: relative;
 }
 
-#add-player {
+.add-player-btn {
     display: flex;
     padding: 0.7em 1em;
     align-items: center;
@@ -303,4 +312,80 @@ button:hover {
     right: 5vw;
     z-index: -1;
     animation: levitation-1 5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+
+/* Rules modal */
+
+#modal-rules, #modal-stats, #modal-add-players {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: #02090E20;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    position: relative;
+    padding: 4em;
+    width: 80vw;
+    height: 75vh;
+    border-radius: 32px;
+    background-color: var(--white-color);
+    z-index: 101;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    box-shadow: 0 0 100px 0px #00000030;
+    overscroll-behavior-y: none;
+    overflow: scroll;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+
+.close-modal {
+    padding: 0.4em 0.7em ;
+    position: fixed;
+    top: 5vh;
+    right: 5vw;
+}
+
+.modal-content h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.modal-content h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 4vh;
+}
+
+.modal-content p {
+    font-size: 1rem;
+    font-weight: 400;
+    margin-top: 2vh;
+}
+
+
+/* modal add players */
+
+.modal-player {
+    width: 20vw;
+    height: 20vh;
+}
+
+#pdp {
+    width: 100px;
+    height: 100px;
+    border-radius: 1000px;
+    background: var(--gradient-light-theme);
 }
