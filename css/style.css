@@ -1,0 +1,391 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+html {
+  font-size: 16px;
+  font-size: clamp(10px, 1.2vw, 18px);
+}
+
+/* font */
+
+@font-face {
+  font-family: 'Uncut Sans';
+  src: url('../assets/fonts/UncutSans.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Newake';
+  src: url('../assets/fonts/Newake.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Variables */
+
+:root {
+    /* Light theme */
+    --color-bg-light: #000;
+    --gradient-light-theme: radial-gradient(71.53% 71.53% at 50% 19.87%, #E9F6FF 0%, var(--Primary, #C4E7FF) 82.69%, #C4E7FF 100%);
+
+    --primary-color: #C4E7FF;
+    --secondary-color: #FFBCF2;
+
+    --dark-blue-color: #02090E;
+    --marine-blue-color: #061A27;
+    --frost-white-color: #E9F6FF;
+    --white-color: #FFFFFF;
+
+    /* Dark theme */
+    --color-bg-dark: #000;
+
+}
+
+/*style general*/
+
+/* Pour appliquer la font à tout les textes de la page */
+*, *::before, *::after {
+    font-family: inherit;
+}
+
+.hidden {
+  display: none !important;
+}
+
+body {
+    background: var(--gradient-light-theme);
+    min-height: 100vh;
+    max-width: 100%;
+    font-family: 'Uncut Sans', sans-serif;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow-y: hidden;
+}
+
+header {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6vh 11vw;
+    
+}
+
+.bg-pattern {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80vh;
+      top: -40px;
+      pointer-events: none;
+      z-index: -1;
+      opacity: 0.4;
+      mix-blend-mode: multiply;
+}
+
+/*  Boutons du jeu */
+
+
+button {
+    cursor: pointer;
+    box-shadow: 0 4px 0 0 #000;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    box-shadow: 0 0px 0 0 #000;
+    transform: translateY(4px);
+}
+
+.primary-btn {
+    display: flex;
+    padding: 0.7em 3em;
+    border-radius: 2rem 2rem 1.6875rem 1.6875rem;
+    border: 0.1em solid var(--dark-blue-color);
+    background: radial-gradient(50% 50% at 50% 50%, #FFBCF2 0%, #FF9DEC 100%);
+    box-shadow: 0 6px 0 0 var(--dark-blue-color);
+    font-weight: 700;
+    font-size: 1.7rem;
+    gap: 1rem;
+    align-items: center;
+}
+
+.play {
+    margin-bottom: 80px;
+}
+
+.secondary-btn {
+    display: flex;
+    padding: 0.7em 3em;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 500;
+    font-size: 1.4rem;
+    border-radius: 2rem 2rem 1.6rem 1.6rem;
+    border: 0.1em solid var(--dark-blue-color);
+    background: var(--marine-blue-color);
+    box-shadow: 0 6px 0 0 var(--dark-blue-color);
+    color: var(--white-color);
+}
+
+.secondary-btn svg {
+    height: 24px;
+}
+
+.theme-btn {
+    padding: 0.7em 0.8em;
+}
+
+/* CSS de la section home */
+
+#view-home {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#cta-section {
+    position: relative;
+    margin-top: 7vh;
+    text-align: center;
+}
+
+#cta-title {
+    color: var(--marine-blue-color);
+    font-weight: 700;
+    font-size: 8rem;
+    letter-spacing: -0.32rem;
+    margin-bottom: 1.5rem;
+}
+
+#cta-text {
+    font-size: 1.5rem;
+}
+
+.nav-container {
+    position: relative;
+    width: 100%;
+}
+
+.arch {
+    display: block;
+    max-width: 100%;
+    bottom: 0;
+    left: 0;
+    z-index: -10;
+    position: absolute;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 0 5%;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.add-player-btn {
+    display: flex;
+    padding: 0.7em 1em;
+    align-items: center;
+    gap: 0.40006rem;
+    border-radius: 1.28019rem 1.28019rem 1.08019rem 1.08019rem;
+    border: 0.1em solid var(--marine-blue-color);
+    font-variation-settings: "wght" 500;
+    font-weight: 500;
+    font-size: 1.2rem;
+    background: var(--white-color);
+}
+
+@keyframes levitation-1 {
+  0%   { transform: translateY(0px) rotate(-5deg); }
+  50%  { transform: translateY(-12px) rotate(-5deg); }
+  100% { transform: translateY(0px) rotate(-5deg); }
+}
+
+@keyframes levitation-2 {
+  0%   { transform: translateY(0px) rotate(8deg); }
+  50%  { transform: translateY(-18px) rotate(8deg); }
+  100% { transform: translateY(0px) rotate(8deg); }
+}
+
+@keyframes levitation-3 {
+  0%   { transform: translateY(0px) rotate(-3deg); }
+  50%  { transform: translateY(-10px) rotate(-3deg); }
+  100% { transform: translateY(0px) rotate(-3deg); }
+}
+
+#cta-section img{
+    position: absolute;
+}
+
+#fg-card-1 {
+    width: 40%;
+    top: -2vh;
+    left: -20vw;
+    animation: levitation-1 4.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+#fg-card-2 {
+    width: 15%;
+    top: 3vh;
+    right: -8vw;
+    animation: levitation-3 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    animation-delay: -2s;
+}
+
+#bg-card-1 {
+    width: 23%;
+    top: -10vh;
+    left: 10vw;
+    z-index: -1;
+    animation: levitation-2 5.7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    animation-delay: -1.2s;
+}
+
+#bg-card-2 {
+    width: 20%;
+    bottom: -13vh;
+    right: 17vw;
+    z-index: -1;
+      animation: levitation-2 4.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation-delay: -1.2s;
+}
+
+#bg-card-3 {
+    width: 27%;
+    top: -15vh;
+    right: 5vw;
+    z-index: -1;
+    animation: levitation-1 5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+
+/* Rules modal */
+
+#modal-rules, #modal-stats, #modal-add-players {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: #02090E20;
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    position: relative;
+    padding: 4em;
+    width: 80vw;
+    height: 75vh;
+    border-radius: 32px;
+    background-color: var(--white-color);
+    z-index: 101;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    box-shadow: 0 0 100px 0px #00000030;
+    overscroll-behavior-y: none;
+    overflow: scroll;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+
+.close-modal {
+    padding: 0.4em 0.7em ;
+    position: fixed;
+    top: 5vh;
+    right: 5vw;
+}
+
+.modal-content h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.modal-content h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-top: 4vh;
+}
+
+.modal-content p {
+    font-size: 1rem;
+    font-weight: 400;
+    margin-top: 2vh;
+}
+
+
+/* modal add players */
+
+.modal-player {
+    width: 20vw;
+    height: 20vh;
+}
+
+#pdp {
+    width: 100px;
+    height: 100px;
+    border-radius: 1000px;
+    background: var(--gradient-light-theme);
+}
