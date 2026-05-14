@@ -1,0 +1,149 @@
+import { Game } from "./Game.js";
+import { Card, NumberCard, BonusCard, SpecialCard } from "./Cards.js";
+
+export class Ui {
+
+    constructor(game) {
+        this.game = game;
+    }
+
+
+    updatePlayButton(playerCount) {
+        document.querySelectorAll('.play-btn').forEach(btn => {
+            btn.disabled = playerCount < 3;
+        });
+    }
+
+
+    updateAddPlayerButton(playerCount) {
+        document.querySelectorAll('.add-player-btn').forEach(btn => {
+            btn.disabled = playerCount > 4;
+        });
+    }
+
+    toggleTheme() {
+        document.documentElement.classList.toggle('dark');
+        const isDark = document.documentElement.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    }
+
+    initTheme() {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    }
+
+    initBackground() {
+        fetch('assets/images/bg-pattern.svg')
+            .then(r => r.text())
+            .then(svg => {
+                document.querySelector('.bg-pattern').innerHTML = svg;
+            });
+    }
+
+    initLogo() {
+        fetch('assets/images/logo-flip7.svg')
+            .then(r => r.text())
+            .then(svg => {
+                document.getElementById('logo-flip7').innerHTML = svg;
+            });
+    }
+
+    renderNavbar(idView) {
+        let selectedView = document.getElementById(idView);
+        selectedView.innerHTML += `<div class="nav-container">
+            <svg class="arch" xmlns="http://www.w3.org/2000/svg" width="100%" height="141" viewBox="0 0 1440 141" fill="none" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M-1.31135e-05 136.484C-0.000122476 88.7447 -0.000177157 64.8752 14.6017 49.5274C29.2036 34.1796 53.0434 32.9913 100.723 30.6148L714.952 0L1339.2 30.6811C1386.92 33.0261 1410.77 34.1986 1425.39 49.549C1440 64.8994 1440 88.784 1440 136.553L1440 142.208H0L-1.31135e-05 136.484Z" fill="var(--element-bg)"/>
+            </svg>
+            <div class="buttons">
+                <button class="secondary-btn btn-rules">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="37" height="37" viewBox="0 0 37 37" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12.0404 3.08337H24.9611C29.7233 3.08337 32.375 5.82754 32.375 10.5296V26.455C32.375 31.2342 29.7233 33.9167 24.9611 33.9167H12.0404C7.35375 33.9167 4.625 31.2342 4.625 26.455V10.5296C4.625 5.82754 7.35375 3.08337 12.0404 3.08337ZM12.4567 10.2675V10.2521H17.0647C17.7292 10.2521 18.2688 10.7917 18.2688 11.4531C18.2688 12.133 17.7292 12.6725 17.0647 12.6725H12.4567C11.7922 12.6725 11.2542 12.133 11.2542 11.47C11.2542 10.8071 11.7922 10.2675 12.4567 10.2675ZM12.4567 19.6409H24.5433C25.2062 19.6409 25.7458 19.1013 25.7458 18.4384C25.7458 17.7755 25.2062 17.2343 24.5433 17.2343H12.4567C11.7922 17.2343 11.2542 17.7755 11.2542 18.4384C11.2542 19.1013 11.7922 19.6409 12.4567 19.6409ZM12.4567 26.6863H24.5433C25.1585 26.6246 25.6225 26.0989 25.6225 25.4838C25.6225 24.8517 25.1585 24.3275 24.5433 24.2659H12.4567C11.9942 24.2196 11.5471 24.4355 11.3004 24.8363C11.0538 25.2217 11.0538 25.7305 11.3004 26.1313C11.5471 26.5167 11.9942 26.748 12.4567 26.6863Z" fill="var(--secondary-btn-color)"/>
+                    </svg>
+                    Règles
+                </button>
+                <button class="primary-btn play-btn" disabled>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="22" viewBox="0 0 18 22" fill="none">
+                        <path d="M17.2552 12.7764C17.1539 12.8803 16.7717 13.3246 16.4156 13.6901C14.3281 15.9888 8.88241 19.7513 6.03215 20.8998C5.59929 21.0843 4.50491 21.4749 3.9202 21.5C3.35992 21.5 2.82582 21.371 2.31616 21.1094C1.68083 20.7439 1.17117 20.1688 0.891906 19.4897C0.712129 19.0185 0.432862 17.6085 0.432862 17.5834C0.153596 16.0408 0 13.5342 0 10.7643C0 8.12521 0.153596 5.72079 0.382245 4.15487C0.408427 4.12979 0.687693 2.37754 0.99314 1.77733C1.55342 0.680833 2.64779 0 3.81896 0H3.9202C4.68294 0.026875 6.28698 0.707708 6.28698 0.732792C8.98364 1.88304 14.3037 5.461 16.4418 7.83854C16.4418 7.83854 17.044 8.4495 17.3058 8.83112C17.7142 9.37937 17.9167 10.0584 17.9167 10.7375C17.9167 11.4953 17.688 12.2013 17.2552 12.7764Z" fill="#02090E"/>
+                    </svg>
+                    Jouer
+                </button>
+                <button class="secondary-btn stats-btn">
+                    <svg width="34" height="33" viewBox="0 0 34 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0.513432 32.1638H9.8803C10.1223 32.1638 10.2433 32.1638 10.3185 32.0886C10.3937 32.0134 10.3937 31.8924 10.3937 31.6504V20.4709C10.3937 19.8584 10.3937 19.5522 10.2035 19.3619C10.0132 19.1717 9.70697 19.1717 9.09451 19.1717H7.7953C4.12056 19.1717 2.28319 19.1717 1.14159 20.3133C0 21.4549 0 23.2922 0 26.967V31.6504C0 31.8924 0 32.0134 0.0751905 32.0886C0.150381 32.1638 0.271398 32.1638 0.513432 32.1638Z" fill="var(--secondary-btn-color)"/>
+                        <path d="M12.2127 32.1637H21.5671C21.8121 32.1637 21.9346 32.1637 22.0107 32.0876C22.0868 32.0115 22.0868 31.889 22.0868 31.644V17.8724C22.0868 15.4225 22.0868 14.1976 21.3257 13.4366C20.5646 12.6755 19.3397 12.6755 16.8899 12.6755C14.4401 12.6755 13.2152 12.6755 12.4541 13.4366C11.693 14.1976 11.693 15.4225 11.693 17.8724V31.644C11.693 31.889 11.693 32.0115 11.7691 32.0876C11.8453 32.1637 11.9677 32.1637 12.2127 32.1637Z" fill="var(--secondary-btn-color)"/>
+                        <path d="M23.9058 32.1638H33.2926C33.5062 32.1638 33.6129 32.1638 33.6848 32.1049C33.698 32.0941 33.71 32.082 33.7208 32.0688C33.7798 31.997 33.7798 31.8902 33.7798 31.6766C33.7798 28.4733 33.7798 26.8716 32.8951 25.7935C32.7331 25.5962 32.5522 25.4152 32.3548 25.2533C31.2768 24.3685 29.6751 24.3685 26.4717 24.3685H24.6853C24.0728 24.3685 23.7666 24.3685 23.5764 24.5588C23.3861 24.7491 23.3861 25.0553 23.3861 25.6677V31.6441C23.3861 31.8891 23.3861 32.0116 23.4622 32.0877C23.5383 32.1638 23.6608 32.1638 23.9058 32.1638Z" fill="var(--secondary-btn-color)"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M20.5646 5.63203C21.3981 4.99536 21.8149 4.67702 21.922 4.41954C22.1225 3.93765 21.9345 3.38181 21.4827 3.12054C21.2413 2.98094 20.7093 2.98094 19.6455 2.98094C19.3601 2.98094 19.2175 2.98094 19.0936 2.95003C18.8274 2.88363 18.5982 2.71467 18.4561 2.48C18.39 2.37079 18.3483 2.23621 18.265 1.96705C17.9592 0.978666 17.8063 0.484474 17.6223 0.301816C17.217 -0.100638 16.5629 -0.100601 16.1576 0.301901C15.9736 0.48458 15.8208 0.978719 15.5151 1.967C15.4319 2.23611 15.3903 2.37066 15.3241 2.47988C15.182 2.71462 14.9528 2.88363 14.6866 2.95004C14.5627 2.98094 14.42 2.98094 14.1347 2.98094C13.0704 2.98094 12.5382 2.98094 12.2967 3.12063C11.8451 3.38191 11.6571 3.93757 11.8575 4.41937C11.9646 4.67696 12.3815 4.99541 13.2153 5.6323L13.3337 5.7227C13.575 5.90699 13.6956 5.99913 13.78 6.10954C13.9259 6.30042 14.0012 6.53596 13.993 6.77609C13.9883 6.91498 13.9435 7.06001 13.8538 7.35007L13.7931 7.54632C13.505 8.47839 13.3609 8.94443 13.4034 9.19011C13.5018 9.75999 14.0465 10.1399 14.6153 10.0355C14.8605 9.99047 15.2481 9.69432 16.0233 9.10202C16.2477 8.93059 16.3599 8.84487 16.4765 8.79431C16.7402 8.68005 17.0394 8.68004 17.3031 8.79428C17.4197 8.84483 17.5319 8.93054 17.7563 9.10196C18.5318 9.69435 18.9195 9.99055 19.1648 10.0355C19.7335 10.1399 20.2781 9.75992 20.3765 9.19008C20.419 8.94436 20.2748 8.47824 19.9865 7.54599L19.9259 7.35012C19.8362 7.06007 19.7914 6.91505 19.7866 6.77617C19.7784 6.53599 19.8537 6.30039 19.9997 6.10947C20.0841 5.99908 20.2047 5.90693 20.446 5.72265L20.5646 5.63203Z" fill="var(--secondary-btn-color)"/>
+                    </svg>
+                    Stats
+                </button>
+            </div>
+        </div>   
+        `;
+    }
+
+    renderWaitroom(players) {
+        let waitroomCounter = document.getElementById('player-cnt');
+        waitroomCounter.innerHTML = `${players.length}/${Game.MAX_PLAYERS_LIMIT} joueurs`;
+
+        let waitroomList = document.getElementById('added-players');
+        waitroomList.innerHTML = '';
+        players.forEach((player, index) => {
+            console.log(player.pseudo);
+            waitroomList.innerHTML += `
+            <div class="player" data-index="${index}">
+                <p class="pseudo">${player.pseudo}</p>
+                <button class="primary-btn delete-player">x</button>
+                <p class="player-type">${player.type}</p>
+            </div>
+            `
+        })
+
+    }
+
+    renderError(title, message) {
+        let divError = document.createElement('div');
+        divError.className = "error-div";
+        divError.innerHTML = `
+        <p class="error-title">${title}</p>
+        <p class="error-message">${message}</p>
+        `;
+        document.body.appendChild(divError);
+
+        setTimeout(() => {
+            divError.classList.add('slide-out-left');
+            setTimeout(() => {
+                divError.remove();
+            }, 400); 
+        }, 3000);
+    }
+
+    renderGameHeader() {
+        document.getElementById('buttons-bar').innerHTML += `
+            <button class="primary-btn quit-btn">Quitter</button>
+        `;
+    }
+
+    clearGameHeader() {
+        document.querySelector('.quit-btn')?.remove();
+    }
+
+    renderCard(card, isFaceUp = true) {
+        let divCard = document.createElement('div');
+        let playerHand = document.getElementById('hand-area');
+
+        if(!isFaceUp) {
+            divCard.className = "card-back";
+        }
+
+        divCard.className = "card";
+        divCard.dataset.type = card.getNom();
+        if(card instanceof NumberCard) {
+            divCard.dataset.value = card.getNumero();
+            playerHand.appendChild(divCard);
+        } else {
+            return;
+        }
+
+    }
+}
