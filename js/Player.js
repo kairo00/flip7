@@ -5,6 +5,7 @@ export class Player{
     #pseudo;
     #hand;
     #canPlay;
+    #saute;
     constructor(pseudo){
         if (this.constructor === Player) {
             throw new TypeError('Abstract class "Player" cannot be instantiated directly');
@@ -12,10 +13,19 @@ export class Player{
         this.#pseudo = pseudo;
         this.#hand = [];
         this.#canPlay = true;
+        this.#saute = false;
     }
 
     getPseudo(){
         return this.#pseudo;
+    }
+
+    getSaute(){
+        return this.#saute;
+    }
+
+    setSaute(saute){
+        this.#saute = saute;
     }
 
     getHand(){

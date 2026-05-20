@@ -1,89 +1,229 @@
+import { Card, NumberCard, BonusCard, SpecialCard } from "./Cards.js";
+export class Game {
+    static MAX_PLAYERS_LIMIT = 5;
+    static MIN_PLAYERS_LIMIT = 3;
+    #players;
+    #scores;
+    #deck;
+    #pile;
+    #round;
+    #currentPlayer;
+    #roundStartPlayer;
+    #player;
 
-import {Board} from "./Board.js";
-import {HumanPlayer} from "./Player.js";
-
-document.addEventListener("DOMContentLoaded", function(){
-    console.log("DOM fully loaded and parsed");
-    const players = [];
-    for (let i = 0; i < 5; i++) {
-        players.push(new HumanPlayer("Player " + (i + 1)));
+    constructor(players) {
+        this.#players = players;
+        this.#scores = [];
+        this.#deck = [];
+        this.#pile = [];
+        this.#round = 0;
+        this.#currentPlayer = 0;
+        this.#roundStartPlayer = -1;
     }
 
-    const board = new Board(players);
-    board.start();
-
-    const currentPlayerEl = document.getElementById("current-player");
-    const deckCountEl = document.getElementById("deck-count");
-    const roundEl = document.getElementById("round");
-    const scoresEl = document.getElementById("scores");
-    const handListEl = document.getElementById("hand-list");
-    const messageEl = document.getElementById("message");
-    const btnTirer = document.getElementById("btn-tirer");
-    const btnStop = document.getElementById("btn-stoper");
-
-    function renderHand(player){
-        handListEl.innerHTML = "";
-        if(player.getHand().length === 0){
-            handListEl.innerHTML = "<li>Aucune carte</li>";
-            return;
-        }
-        for (const card of player.getHand()){
-            const li = document.createElement("li");
-            li.textContent = `${card.getNumero()} ${card.getNom()}`;
-            handListEl.appendChild(li);
+    shuffleDeck() {
+        for (let i = this.#deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.#deck[i], this.#deck[j]] = [this.#deck[j], this.#deck[i]];
         }
     }
 
-    function renderState(message = ""){
-        const state = board.getState();
-        currentPlayerEl.textContent = `Joueur actif : ${state.currentPlayerPseudo}`;
-        deckCountEl.textContent = `Cartes restantes : ${state.deckCount}`;
-        roundEl.textContent = `Round : ${state.round}`;
-        scoresEl.textContent = `Scores : ${state.scores.map((score, i) => `${players[i].getPseudo()}: ${score}`).join(', ')}`;
-        messageEl.textContent = message;
-        renderHand(board.getCurrentPlayer());
+
+    createDeck() {
+        let deck = [];
+
+        //cartes number
+        for (let i = 12; i >= 0; i--) {
+            for (let j = 1; j <= i; j++) {
+                deck.push(new NumberCard(i));
+            }
+        }
+        deck.push(new NumberCard(0));
+
+        //cartes bonus
+        deck.push(new BonusCard(2, 'x'));
+        deck.push(new BonusCard(2, '+'));
+        deck.push(new BonusCard(4, '+'));
+        deck.push(new BonusCard(6, '+'));
+        deck.push(new BonusCard(8, '+'));
+        deck.push(new BonusCard(10, '+'));
+
+        //cartes speciales
+        for(let i = 0; i < 3; i++){
+            deck.push(new SpecialCard('SECONDECHANCE'));
+            deck.push(new SpecialCard('STOP'));
+            deck.push(new SpecialCard('TROISALASUITE'));
+        }
+        this.#deck = deck;
+        this.shuffleDeck();
     }
 
-    function endGame(message){
-        messageEl.textContent = message;
-        btnTirer.disabled = true;
-        btnStop.disabled = true;
+    nextPlayer() {
+        this.#currentPlayer = (this.#currentPlayer + 1) % this.#players.length;
     }
 
-    function handleAction(action){
-        const result = board.playAction(action);
-        switch(result.status){
-            case "continue":
-                renderState("Carte tirée. Continuez ou stoppez.");
-                break;
-            case "flip7":
-                renderState("Flip 7 ! Tour terminé.");
-                break;
-            case "duplicate":
-                renderState("Carte déjà présente. Tour terminé.");
-                break;
-            case "empty":
-                renderState("Le deck est vide. Deck reshufflé vous pouvez tirer une carte.");           
-                break;
-            case "stopped":
-                renderState("Tour arrêté. Joueur suivant.");
-                break;
-            default:
-                renderState("");
+    resetRound() {
+        this.#round += 1;
+        console.log(`Début du round ${this.#round}`);
+    }
+
+    #checkWin() {
+        for (let i = 0; i < this.#players.length; i++) {
+            if (this.#scores[i] >= 200) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    start() {
+        this.createDeck();
+        this.#scores = new Array(this.#players.length).fill(0);
+        this.#currentPlayer = Math.floor(Math.random() * this.#players.length);
+        this.#roundStartPlayer = this.#currentPlayer;
+        this.#round = 1;
+        this.#pile = [];
+    }
+
+    getCurrentPlayer() {
+        return this.#players[this.#currentPlayer];
+    }
+
+    getPlayers() {
+        return [...this.#players];
+    }
+
+
+    getDeck() {
+        return this.#deck;
+    }
+
+    getDeckCount() {
+        return this.#deck.length;
+    }
+
+    getPile() {
+        return this.#pile;
+    }
+
+    getState() {
+        return {
+            players: this.#players.map(player => ({
+                pseudo: player.getPseudo(),
+                hand: [...player.getHand()],
+                canPlay: player.getCanPlay()
+            })),
+            scores: [...this.#scores],
+            currentPlayerIndex: this.#currentPlayer,
+            currentPlayerPseudo: this.getCurrentPlayer().getPseudo(),
+            round: this.#round,
+            deckCount: this.getDeckCount(),
+            pile: [...this.#pile],
+            gameOver: this.#checkWin(),
+        };
+    }
+
+    playAction(action) {
+        const normalized = typeof action === 'string' ? action.toUpperCase() : '';
+
+        if (normalized === "T") {
+            const result = this.#tirerCarte();
+            if (result.status !== 'continue' && result.status !== 'empty') {
+                this.nextPlayer();
+                if (this.#currentPlayer === this.#roundStartPlayer) {
+                    this.#calculateScores();
+                    this.resetRound();
+                }
+            }
+            console.log(`Après action T - Pile: ${this.#pile.length}, status: ${result.status}`);
+            return result;
         }
 
-        if(board.getState().gameOver){
-            endGame("Le jeu est terminé.");
+        if (normalized === "S") {
+            this.nextPlayer();
+            if (this.#currentPlayer === this.#roundStartPlayer) {
+                this.#calculateScores();
+                this.resetRound();
+            }
+            console.log(`Après action S - Pile: ${this.#pile.length}`);
+            return { status: 'stopped' };
+        }
+
+        throw new RangeError('Action must be "T" or "S".');
+    }
+
+    #viderDeck(player) {
+        for (const card of player.getHand()) {
+            this.#pile.push(card);
+        }
+        player.setHand([]);
+    }
+
+    #calculateScores() {
+        for (let i = 0; i < this.#players.length; i++) {
+            const player = this.#players[i];
+            let points = 0;
+            for (const card of player.getHand()) {
+                if (card instanceof NumberCard) {
+                    points += card.getNumero();
+                }
+            }
+            this.#scores[i] += points;
+            console.log(`${player.getPseudo()} gagne ${points} points. Score total: ${this.#scores[i]}`);
+        }
+        
+        for (const player of this.#players) {
+            this.#viderDeck(player);
         }
     }
 
-    btnTirer.addEventListener("click", function(){
-        handleAction("T");
-    });
+    #checkFlip7(player) {
+        if (player.getHand().length >= 7) {
+            let count = 0;
+            for (const card of player.getHand()) {
+                if (card instanceof NumberCard) {
+                    count++;
+                }
+            }
+            return count >= 7;
+        }
+        return false;
+    }
 
-    btnStop.addEventListener("click", function(){
-        handleAction("S");
-    });
+    #checkTooMuchCards(player, card) {
+        for (const c of player.getHand()) {
+            if (c instanceof NumberCard && (c.getNom() == card.getNom())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-    renderState("Le jeu commence. Cliquez sur Tirer pour jouer.");
-});
+    #tirerCarte() {
+        if (this.#deck.length === 0) {
+            this.#deck = [...this.#pile];
+            this.#pile = [];
+            this.shuffleDeck();
+            return { status: 'empty' };
+        }
+
+        const card = this.#deck.pop();
+        const player = this.#players[this.#currentPlayer];
+
+        console.log("Vous avez tiré la carte : " + card.getNom());
+
+        if (this.#checkTooMuchCards(player, card)) {
+            console.log("Vous avez déjà une carte " + card.getNom() + " dans votre main !");
+            this.#viderDeck(player);
+            return { status: 'duplicate', card };
+        }
+
+        player.getHand().push(card);
+        if (this.#checkFlip7(player)) {
+            return { status: 'flip7', card };
+        }
+
+        return { status: 'continue', card };
+    }
+}
+

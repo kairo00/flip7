@@ -1,68 +1,80 @@
-const Chiffre_To_Words = ['ZERO','UN','DEUX','TROIS','QUATRE','CINQ','SIX','SEPT','HUIT','NEUF','DIX','ONZE','DOUZE'];
+const NUMBER_TO_WORD = ['ZERO','UN','DEUX','TROIS','QUATRE','CINQ','SIX','SEPT','HUIT','NEUF','DIX','ONZE','DOUZE'];
+const SPECIAL_CARDS = ['SECONDECHANCE', 'STOP', 'TROISALASUITE'];
 
-
-export class Cards{
+export class Card{
     //Classe pour instancier les objets cartes 
-    _nom;
-    _numero;
     constructor(){
-        if (this.constructor === Cards) {
-            throw new TypeError('Abstract class "Cards" cannot be instantiated directly');
+        if (this.constructor === Card) {
+            throw new TypeError('Abstract class "Card" cannot be instantiated directly');
         }
     }
 
     getNom(){
-        return this._nom;
-    }
-
-    getNumero(){
-        return this._numero;
+        throw new Error("La méthode 'getNom()' doit être implémentée par la classe enfant.");
     }
 }
 
-export class BonusCard extends Cards{
-    _calcule;
-    constructor(numero, calcule){
+export class BonusCard extends Card{
+    #valeur;
+    #operation
+    constructor(valeur, operation){
         super();
-        if(![2, 4, 6, 8, 10].includes(numero)){
+        if(![2, 4, 6, 8, 10].includes(valeur)){
             throw new RangeError('The number must be 2, 4, 6, 8 or 10');
         }
-        if(calcule != 'x' && calcule != '+'){
+        if(operation != 'x' && operation != '+'){
             throw new RangeError('The calculation must be either "x" or "+"');
         }
-        this._numero = numero;
-        this._calcule = calcule;
-        this._nom = Chiffre_To_Words[numero] + calcule;
+        this.#valeur = valeur;
+        this.#operation = operation;
+    }
+
+    getValeur() {
+        return this.#valeur;
     }
 
 
-    getCalcule(){
-        return this._calcule;
+    getOperation(){
+        return this.#operation;
+    }
+
+    getNom() {
+        return `${this.#operation}${this.#valeur}`;
     }
 }
 
-export class SpecialCard extends Cards{
+export class SpecialCard extends Card{
+    #nom
     constructor(nom){
         super();
-        if(nom != 'SECONDECHANCE' && nom != 'STOP' && nom != 'TROISALASUITE'){
-            throw new RangeError('The special card name must be either "SECONDECHANCE", "STOP" or "TROISALASUITE"');
+
+        if (!SPECIAL_CARDS.includes(nom)) {
+            throw new RangeError(`Carte spéciale invalide : ${nom}`);
         }
-        this._nom = nom;
-        this._numero = -1;
+
+        this.#nom = nom;
     }
 
-
+    getNom() {
+        return this.#nom;
+    }
 }
 
-export class NumberCard extends Cards{
+export class NumberCard extends Card{
+    #numero
     constructor(numero){
         super();
         if(numero < 0 || numero > 12){
             throw new RangeError('The number must be between 0 and 12');
         }
-        this._numero = numero;
-        this._nom = Chiffre_To_Words[numero];
+        this.#numero = numero;
     }
 
+    getNumero() { 
+        return this.#numero; 
+    }
 
+    getNom() {
+        return NUMBER_TO_WORD[this.#numero];
+    }
 }
