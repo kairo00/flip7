@@ -19,10 +19,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if(numberOfPlayers < 2 || numberOfPlayers > 6){
             numberOfPlayers = 2;
         }
-        for (let i = 0; i < numberOfPlayers; i++) {
-            //players.push(new HumanPlayer("Player " + (i + 1)));
-            players.push(new ComputerPlayer("Bot " + (i + 1),1));
-        }
+        // for (let i = 0; i < numberOfPlayers; i++) {
+           
+            
+        // }
+        players.push(new ComputerPlayer("Bot facile " ,1));
+        players.push(new ComputerPlayer("Bot hard"  ,2));
+        //players.push(new HumanPlayer("Player "));
         
 
         const board = new Board(players);
@@ -177,37 +180,55 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (board.getState().gameOver) {
                     endGame(`Le jeu est terminé. ${board.getState().playerWin.getPseudo()} a gagné !`);
                 }
+
+                if(board.getCurrentPlayer() instanceof ComputerPlayer && !board.getState().gameOver){
+                    const choix = board.getCurrentPlayer().makeDecision(board);
+                    await new Promise(r => setTimeout(r, 1200));
+                    await handleAction(choix, button);
+                }
             } catch (error) {
                 console.error("Erreur lors de l'action:", error);
                 renderState("Une erreur est survenue.");
             } finally {
-                // Re-enable buttons if game is not over
-                if (!board.getState().gameOver) {
+                if (!board.getState().gameOver && !(board.getCurrentPlayer() instanceof ComputerPlayer)){
                     button.tirer.disabled = false;
                     button.stop.disabled = false;
                 }
             }
+
+            
         }
         
-
         let button = {};
         button.tirer = btnTirer;
         button.stop = btnStop;
+        
+        let isProcessingAction = false;
 
-        btnTirer.addEventListener("click", function () {
-            handleAction("T", button);
+        btnTirer.addEventListener("click", async function () {
+            if (isProcessingAction) return;
+            isProcessingAction = true;
+            button.tirer.disabled = true;
+            button.stop.disabled = true;
+            await handleAction("T", button);
+            isProcessingAction = false;
         });
 
-        btnStop.addEventListener("click", function () {
-            handleAction("S", button);
+        btnStop.addEventListener("click", async function () {
+            if (isProcessingAction) return;
+            isProcessingAction = true;
+            button.tirer.disabled = true;
+            button.stop.disabled = true;
+            await handleAction("S", button);
+            isProcessingAction = false;
         });
 
         renderState("Le jeu commence. Cliquez sur Tirer pour jouer.");
 
         if(board.getCurrentPlayer() instanceof ComputerPlayer){
-            const choix = board.getCurrentPlayer().makeDecision();
+            const choix = board.getCurrentPlayer().makeDecision(board);
             await new Promise(r => setTimeout(r, 800));
-            handleAction(choix, button);
+            await handleAction(choix, button);
         }
     });
 });

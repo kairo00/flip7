@@ -160,8 +160,12 @@ export class Board {
     }
 
 
-
     async #askPlayerToSelectTarget(playerlist) {
+        if (this.getCurrentPlayer().constructor.name === "ComputerPlayer") {
+            
+            const randomIndex = await this.getCurrentPlayer().getIndexPlayerList(playerlist);
+            return playerlist[randomIndex];
+        }
         return new Promise((resolve) => {
             let divselector = document.createElement('div');
             divselector.id = 'nomHugoLeBossSelect';
