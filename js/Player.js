@@ -1,3 +1,4 @@
+import { NumberCard, SpecialCard, BonusCard } from "./Card.js";
 const IA_LEVELS = [1, 2];
 
 export class Player{
@@ -56,9 +57,132 @@ export class ComputerPlayer extends Player{
     #niveau;
     constructor(pseudo, niveau){
         super(pseudo);
-        if(! niveau in IA_LEVELS){
+        if(! IA_LEVELS.includes(niveau)){
             throw new RangeError('This IA level does not exist.');
         }
         this.#niveau = niveau;
+    }
+
+    makeDecision(board){
+        if(this.#niveau == 1){
+            if(this.getHand().length == 0){
+                return "T";
+            }
+            return Math.random() < 0.5 ? "T" : "S";
+        }
+        if(this.#niveau == 2){
+            
+            if(this.getHand().length == 0){
+                return "T";
+            }
+
+            const state = board.getState();
+            const hand = this.getHand();
+            
+        
+            const initialDist = {
+                'Number_0': 1, 'Number_1': 1, 'Number_2': 2, 'Number_3': 3, 'Number_4': 4,
+                'Number_5': 5, 'Number_6': 6, 'Number_7': 7, 'Number_8': 8, 'Number_9': 9,
+                'Number_10': 10, 'Number_11': 11, 'Number_12': 12,
+                'Bonus_2x': 1, 'Bonus_2+': 1, 'Bonus_4+': 1, 'Bonus_6+': 1, 'Bonus_8+': 1, 'Bonus_10+': 1,
+                'Special_SECONDECHANCE': 3, 'Special_STOP': 3, 'Special_TROISALASUITE': 3
+            };
+
+           const seen = {};
+           function registerCard(carte) {
+               let nomUnique;
+
+               if (carte instanceof NumberCard) {
+                   nomUnique = "Number_" + carte.getNumero();
+               } 
+               else if (carte instanceof BonusCard) {
+                   nomUnique = "Bonus_" + carte.getValeur() + carte.getOperation();
+               } 
+               else if (carte instanceof SpecialCard) {
+                   nomUnique = "Special_" + carte.getNom();
+               }
+
+               if (nomUnique !== undefined) {
+                   if (seen[nomUnique] === undefined) {
+                       seen[nomUnique] = 1;
+                   } else {
+                       seen[nomUnique] = seen[nomUnique] + 1;
+                   }
+               }
+           }
+
+           state.pile.forEach(registerCard);
+         
+            const listeJoueurs = board.getPlayers();
+
+            for (let p of listeJoueurs) {
+                const mainDuJoueur = p.getHand();
+                for (let carte of mainDuJoueur){
+                    registerCard(carte);
+                }
+            }
+            
+            let totalInDeck = 0;
+            let bustCardsInDeck = 0;
+            
+            const hasSecondChance = hand.some(c => c instanceof SpecialCard && c.getNom() === 'SECONDECHANCE');
+            if(hasSecondChance){
+                return "T";
+            }
+
+            for (const key in initialDist) {
+                const remaining = Math.max(0, initialDist[key] - (seen[key] || 0));
+                totalInDeck += remaining;
+                
+             
+                if (key.startsWith('Number_')) {
+                    const num = parseInt(key.split('_')[1]);
+                    if (hand.some(c => c instanceof NumberCard && c.getNumero() === num)) {
+                        bustCardsInDeck += remaining;
+                    }
+                }
+            }
+
+            const bustProba = totalInDeck > 0 ? bustCardsInDeck / totalInDeck : 1;
+
+         
+            let currentPoints = 0;
+            let uniqueNums = new Set();
+            hand.forEach(c => {
+                if (c instanceof NumberCard) {
+                    currentPoints += c.getNumero();
+                    uniqueNums.add(c.getNumero());
+                }
+            });
+
+           
+            let pourcentage = 0.32; 
+            if (currentPoints < 30) pourcentage = 0.40; 
+            if (currentPoints > 70) pourcentage = 0.15; 
+            
+        
+            if (uniqueNums.size === 6) pourcentage += 0.15;
+
+            return bustProba < pourcentage ? "T" : "S";
+        }
+
+    }
+
+    async getIndexPlayerList(playerlist){
+        await new Promise(r => setTimeout(r, 2000));
+        if(this.#niveau == 1){
+            return Math.floor(Math.random() * playerlist.length);
+        }
+        if(this.#niveau == 2){
+            let targetIdx = 0;
+            let maxCards = -1;
+            for(let i = 0; i < playerlist.length; i++){
+                if(playerlist[i].getHand().length > maxCards){
+                    maxCards = playerlist[i].getHand().length;
+                    targetIdx = i;
+                }
+            }
+            return targetIdx;
+        }
     }
 }
