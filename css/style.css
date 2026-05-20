@@ -93,6 +93,8 @@ html {
     --modals-overlay-color: #02090E20;
     --element-bg: #ffffff;
     --high-contrast-color: #fff;
+    --text-player: #EEDFBB;
+
 }
 
 :root.dark {
@@ -106,7 +108,8 @@ html {
     --secondary-btn-color: #fff;
     --modals-overlay-color: #ffffff20;
     --high-contrast-color: #000;
-    --white-color: #fff
+    --white-color: #fff;
+    --text-player: #c5b28a;
 }
 
 /*style general*/
@@ -151,6 +154,24 @@ body {
     position: relative;
     overflow-y: hidden;
     transition: opacity 1s ease;
+}
+
+/* Ajoute ceci dans ton fichier CSS */
+
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 9999;
+    /* Ton SVG encodé pour le CSS */
+    background-image: url("data:image/svg+xml,%3Csvg width='700' height='700' viewBox='0 0 700 700' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg filter='url(%23filter0_n_215_74)'%3E%3Crect width='700' height='700' fill='white'/%3E%3C/g%3E%3Cdefs%3E%3Cfilter id='filter0_n_215_74' x='0' y='0' width='700' height='700' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'%3E%3CfeFlood flood-opacity='0' result='BackgroundImageFix'/%3E%3CfeBlend mode='normal' in='SourceGraphic' in2='BackgroundImageFix' result='shape'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1 1' stitchTiles='stitch' numOctaves='3' result='noise' seed='3565' /%3E%3CfeColorMatrix in='noise' type='luminanceToAlpha' result='alphaNoise' /%3E%3CfeComponentTransfer in='alphaNoise' result='coloredNoise1'%3E%3CfeFuncA type='discrete' tableValues='1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 '/%3E%3C/feComponentTransfer%3E%3CfeComposite operator='in' in2='shape' in='coloredNoise1' result='noise1Clipped' /%3E%3CfeFlood flood-color='%23444444' result='color1Flood' /%3E%3CfeComposite operator='in' in2='noise1Clipped' in='color1Flood' result='color1' /%3E%3CfeMerge result='effect1_noise_215_74'%3E%3CfeMergeNode in='shape' /%3E%3CfeMergeNode in='color1' /%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3C/svg%3E");
+    mix-blend-mode: difference;
+
+    opacity: 0.02;
 }
 
 header {
@@ -211,7 +232,6 @@ header {
     justify-content: left;
     gap: 0.5em;
     padding: 2em;
-    backdrop-filter: blur(16px);
     color: var(--text-color);
     animation: error-slide-in-right 0.4s ease-out forwards;
 
@@ -258,7 +278,7 @@ button:hover {
 }
 
 .play-btn {
-    margin-bottom: 80px;
+    margin-bottom: 5%;
 }
 
 .primary-btn:disabled, .add-player-btn:disabled {
@@ -337,29 +357,46 @@ button:hover {
     color: var(--text-color);
 }
 
-.nav-container {
+.nav-container,
+#action-container {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
+    display: grid;
+    align-items: end;
+    z-index: 10;
+    pointer-events: none; 
+}
+
+.nav-container button,
+#action-container button {
+    pointer-events: auto;
 }
 
 .arch {
+    grid-area: 1 / 1;
+    width: 100%;
+    height: auto;
     display: block;
-    max-width: 100%;
-    bottom: 0;
-    left: 0;
-    z-index: -10;
-    position: absolute;
+    z-index: -1;
+    margin-bottom: -1.96vw;
 }
 
-.buttons {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 0 5%;
-  margin-bottom: 30px;
-  position: relative;
+.buttons,
+.buttons-game {
+    grid-area: 1 / 1;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 5%;
+    padding-bottom: 1.5%;
+}
+
+.buttons-game {
+    justify-content: center;
+    gap: 10vw;
+    padding-bottom: 4.5%;
 }
 
 .add-player-btn {
@@ -718,4 +755,241 @@ input[type=text]:active {
 
 #add-player {
     padding: 0.7em 2em;
+}
+
+
+#view-game {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: visible;
+}
+
+.top-row {
+    display: flex;
+}
+
+#buttons-bar {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+#current-player {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 3%;
+    color: var(--text-color);
+    font-weight: 500;
+    font-size: 1.2rem;
+}
+
+#current-player #player-name{
+    -webkit-text-stroke-color: var(--text-color);
+    -webkit-text-stroke-width: 0.05em;
+    paint-order: stroke fill;
+    font-weight: 400;
+    color: var(--text-player);
+    font-size: 2.5rem;
+    font-family: 'Newake', sans-serif;
+    text-shadow: 0.01em 0.01em 0 var(--text-color),
+                 0.02em 0.02em 0 var(--text-color),
+                 0.03em 0.03em 0 var(--text-color),
+                 0.04em 0.04em 0 var(--text-color),
+                 0.05em 0.05em 0 var(--text-color),
+                 0.06em 0.06em 0 var(--text-color),
+                 0.07em 0.07em 0 var(--text-color),
+                 0.08em 0.08em 0 var(--text-color);
+    letter-spacing: 0.05em;
+    margin-top: 0.1em;
+}
+
+.quit-btn {
+    padding: 0.7em 0.8em;
+}
+
+
+#hand-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    align-items: start;
+    position: fixed;
+    bottom: 5.5vw;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+}
+
+#special-number-card {
+    display: flex;
+    align-items: end;
+    gap: 10vw;
+}
+
+#number-card-container {
+    display: flex;
+    align-items: flex-end;
+    min-height: 15vw;
+    min-width: 20vw; 
+}
+
+#bonus-card-container {
+    display: flex;
+    gap: 8px;
+    min-height: 6vw; 
+    min-width: 10vw;
+}
+
+#special-card-container {
+    display: flex;
+    min-height: 15vw;
+    min-width: 10vw;
+}
+
+.hand-card {
+    width: clamp(5rem, 10vw, 12rem);
+    aspect-ratio: 480 / 669;
+    object-fit: contain;
+}
+
+.number-card {
+    position: relative; 
+    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1) !important;
+    cursor: pointer;
+    pointer-events: auto !important; 
+}
+
+.number-card + .number-card {
+    margin-left: clamp(-120px, -4vw, -20px); 
+}
+
+.number-card:hover {
+    transform: translateY(-40px) scale(1.15) !important; 
+}
+
+.number-card:hover ~ .number-card {
+    transform: translateX(40px) !important;
+}
+
+.bonus-card {
+    width: 5vw; 
+}
+
+
+#dd-container {
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    padding: 20px;
+}
+
+#draw-container, #discard-container {
+    position: relative;
+    width: 10vw;
+    aspect-ratio: 480 / 669;
+}
+
+#dd-container img {
+    position: absolute;
+    width: 8vw;
+    aspect-ratio: 480 / 669;
+    object-fit: contain;
+}
+
+#hit-btn {
+    background: var(--primary-color);
+}
+
+#stop-btn {
+    margin-right: 15vw;
+}
+
+.next-player-overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--modals-overlay-color);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+}
+
+.next-player-overlay p {
+    -webkit-text-stroke-color: var(--text-color);
+    -webkit-text-stroke-width: 0.05em;
+    paint-order: stroke fill;
+    font-weight: 400;
+    color: var(--text-player);
+    font-size: 5rem;
+    font-family: 'Newake', sans-serif;
+    text-shadow: 0.01em 0.01em 0 var(--text-color),
+                 0.02em 0.02em 0 var(--text-color),
+                 0.03em 0.03em 0 var(--text-color),
+                 0.04em 0.04em 0 var(--text-color),
+                 0.05em 0.05em 0 var(--text-color),
+                 0.06em 0.06em 0 var(--text-color),
+                 0.07em 0.07em 0 var(--text-color),
+                 0.08em 0.08em 0 var(--text-color);
+    letter-spacing: 0.05em;
+}
+
+.spacer {
+    height: 10vh;
+    flex-shrink: 0;
+}
+
+.top-row {
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 2vh 5vw;
+    box-sizing: border-box;
+}
+
+#round-message {
+    position: fixed;
+    top: 6vh;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    color: var(--text-color);
+    z-index: 50;
+    pointer-events: none;
+}
+
+#round {
+    -webkit-text-stroke-color: var(--text-color);
+    -webkit-text-stroke-width: 0.05em;
+    paint-order: stroke fill;
+    font-weight: 400;
+    color: var(--text-player);
+    font-size: 2rem;
+    font-family: 'Newake', sans-serif;
+    text-shadow: 0.01em 0.01em 0 var(--text-color),
+                 0.02em 0.02em 0 var(--text-color),
+                 0.03em 0.03em 0 var(--text-color),
+                 0.04em 0.04em 0 var(--text-color),
+                 0.05em 0.05em 0 var(--text-color),
+                 0.06em 0.06em 0 var(--text-color),
+                 0.07em 0.07em 0 var(--text-color),
+                 0.08em 0.08em 0 var(--text-color);
+    letter-spacing: 0.05em;
+    margin-top: -0.2em;
+}
+
+/*  ESPACE DEVMODE /!\  */
+
+.dev {
+    margin: 0;
+    padding: 0.4em 0.5em;
 }

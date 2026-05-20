@@ -1,10 +1,39 @@
-import { Game } from "./Game.js";
+import { Game } from "./game.js";
+import { ComputerPlayer } from './Player.js';
 import { Card, NumberCard, BonusCard, SpecialCard } from "./Cards.js";
+
+const DICTIONNAIRE_FICHIERS_CARTES = {
+    '+2': 'plus2',
+    '+4': 'plus4',
+    '+6': 'plus6',
+    '+8': 'plus8',
+    '+10': 'plus10',
+    'x2': 'fois2',
+    'SECONDECHANCE': 'seconde_chance',
+    'TROISALASUITE': 'trois_a_la_suite',
+    'STOP': 'stop'
+};
 
 export class Ui {
 
-    constructor(game) {
-        this.game = game;
+    #game
+
+    #HTML_ELEMENT = {
+        currentPlayerEl: document.getElementById("current-player"),
+        deckCountEl: document.getElementById("deck-count"),
+        roundEl: document.getElementById("round"),
+        scoresEl: document.getElementById("scores"),
+        messageEl: document.getElementById("message"),
+        btnTirer: document.getElementById("hit-btn"),
+        btnStop: document.getElementById("stop-btn")
+    }
+
+    constructor(game = null) {
+        this.#game = game;
+    }
+
+    setGame(game) {
+        this.#game = game;
     }
 
 
@@ -120,7 +149,11 @@ export class Ui {
 
     renderGameHeader() {
         document.getElementById('buttons-bar').innerHTML += `
-            <button class="primary-btn quit-btn">Quitter</button>
+            <button class="primary-btn quit-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 21" fill="none">
+                    <path d="M10.2001 20.0133C14.7301 20.0133 18.6501 17.1033 19.9601 12.7733C20.0701 12.4233 19.9701 12.0333 19.7101 11.7733C19.4501 11.5133 19.0701 11.4133 18.7101 11.5233C17.9301 11.7533 17.1301 11.8733 16.3301 11.8733C11.8101 11.8733 8.13006 8.19327 8.13006 3.67327C8.13006 2.87327 8.25006 2.07327 8.48006 1.29327C8.53282 1.11958 8.53742 0.934829 8.49335 0.758738C8.44928 0.582647 8.3582 0.421834 8.22985 0.293479C8.10149 0.165124 7.94068 0.0740469 7.76459 0.0299776C7.5885 -0.0140916 7.40374 -0.009498 7.23006 0.043268C5.13369 0.676313 3.29765 1.96911 1.99501 3.7294C0.692361 5.48968 -0.00730837 7.62342 5.75689e-05 9.81327C5.75689e-05 15.4333 4.58006 20.0133 10.2001 20.0133Z" fill="var(--secondary-btn-color)"/>
+                </svg>
+            </button>
         `;
     }
 
@@ -128,22 +161,274 @@ export class Ui {
         document.querySelector('.quit-btn')?.remove();
     }
 
-    renderCard(card, isFaceUp = true) {
-        let divCard = document.createElement('div');
-        let playerHand = document.getElementById('hand-area');
+    createCard(card, isFaceUp = true, className) {
+        let imgCard = document.createElement('img');
+        imgCard.className = className;
+        imgCard.src = this.getCardFileName(card, isFaceUp);
 
+        imgCard.dataset.value = isFaceUp ? (card instanceof NumberCard ? card.getNumero() : card.getNom()): "back-card";
+
+        return imgCard;
+
+    }
+
+    getCardFileName(card, isFaceUp) {
         if(!isFaceUp) {
-            divCard.className = "card-back";
+            return "assets/sprites/back.webp";
         }
-
-        divCard.className = "card";
-        divCard.dataset.type = card.getNom();
         if(card instanceof NumberCard) {
-            divCard.dataset.value = card.getNumero();
-            playerHand.appendChild(divCard);
-        } else {
+            return `assets/sprites/${card.getNumero()}.webp`;
+        }
+        return `assets/sprites/${DICTIONNAIRE_FICHIERS_CARTES[card.getNom()]}.webp`;
+    }
+
+    clearHand() {
+        document.getElementById('number-card-container').innerHTML = '';
+        document.getElementById('special-card-container').innerHTML = '';
+        document.getElementById('bonus-card-container').innerHTML = '';
+    }
+
+    renderHand(tableauCartes) {
+        this.clearHand();
+        const containerNumber = document.getElementById('number-card-container');
+        const containerSpecial = document.getElementById('special-card-container');
+        const containerBonus = document.getElementById('bonus-card-container');
+
+        for (let card of tableauCartes) {
+            let imgCard = this.createCard(card, true, 'hand-card');
+            if(card instanceof NumberCard) {
+                const randomAngle = Math.floor(Math.random() * 10) - 5;
+                const randomPosY = Math.floor(Math.random() * 6) -3;
+
+                imgCard.classList.add('number-card');
+                imgCard.style.transform = `rotate(${randomAngle}deg) translateY(${randomPosY}px)`;
+                containerNumber.appendChild(imgCard);
+            } else if(card instanceof SpecialCard) {
+
+                imgCard.classList.add('special-card');
+                imgCard.style.transform = "rotate(2deg)";
+                containerSpecial.appendChild(imgCard);
+            } else if(card instanceof BonusCard) {
+
+                imgCard.classList.add('bonus-card');
+                containerBonus.appendChild(imgCard);
+            }
+        }
+    }
+
+    clearDraw() {
+        let drawContainer = document.getElementById('draw-container');
+        drawContainer.innerHTML = '';
+    }
+
+    renderDrawPile(deck) {
+        this.clearDraw();
+        const drawContainer = document.getElementById('draw-container');
+
+        if(deck.length === 0) {
+            drawContainer.innerHTML = '<div id="empty-draw">Pioche vide</div>';
             return;
         }
 
+        const visibleCards = deck.slice(-5);
+
+        visibleCards.forEach((card, index) => {
+            const cardImg = this.createCard(card, false, 'draw-card');
+
+            cardImg.style.position = "absolute";
+            cardImg.style.top = `${-index*2}px`;
+            cardImg.style.left = `${index*1}px`;
+
+            drawContainer.appendChild(cardImg);
+        });  
+    }
+
+    clearDiscard() {
+        let discardContainer = document.getElementById('discard-container');
+        discardContainer.innerHTML = '';
+    }
+
+    renderDiscardPile(pile) {
+        this.clearDiscard();
+        const discardContainer = document.getElementById('discard-container');
+
+        if(pile.length === 0) {
+            discardContainer.innerHTML = '<div id="empty-discard">Pile vide</div>';
+            return;
+        }
+
+        const visibleCards = pile.slice(-5);
+
+        visibleCards.forEach((card, index) => {
+            const cardImg = this.createCard(card, true, 'discard-card');
+
+            cardImg.style.position = "absolute";
+            cardImg.style.top = `${-index*2}px`;
+            cardImg.style.left = `${index*1}px`;
+            const randomAngle = Math.floor(Math.random() * 10) - 5;
+            cardImg.style.transform = `rotate(${randomAngle}deg)`;
+
+            discardContainer.appendChild(cardImg);
+        });  
+    }
+
+renderPlayer(player) {
+    console.log(player.getPseudo(), player.getHand());
+    const state = this.#game.getState();
+    const playerIndex = this.#game.getPlayers().indexOf(player);
+    const score = state.scores[playerIndex];
+    const isCurrentPlayer = player === this.#game.getCurrentPlayer();
+    let playerInfo = document.createElement('div');
+
+    const cardsSection = document.createElement('div');
+    cardsSection.className = 'hand-cards';
+    for (const card of player.getHand()) {
+        const img = this.createCard(card, true, 'card-mini');
+        cardsSection.appendChild(img);
+    }
+
+    if (isCurrentPlayer) {
+        playerInfo.className = 'current-player-info';
+        playerInfo.innerHTML = `
+            <div class="player-name">
+                <span class="pseudo">${player.getPseudo()}</span>
+                <span class="player-type">${player instanceof ComputerPlayer ? 'Bot' : 'Joueur'}</span>
+            </div>
+            <div class="player-score">${score}</div>
+        `;
+    } else if (!player.getCanPlay()) {
+        playerInfo.className = 'inactive-player-info';
+        const scoreInfo = player.getSaute()
+            ? `<span class="bust-label">BUST</span>`
+            : `${score}`;
+        playerInfo.innerHTML = `
+            <div class="player-name">
+                <span class="pseudo">${player.getPseudo()}</span>
+                <span class="player-type">${player instanceof ComputerPlayer ? 'Bot' : 'Joueur'}</span>
+            </div>
+            <div class="player-score">${scoreInfo}</div>
+        `;
+    } else {
+        playerInfo.className = 'ingame-player-info';
+        playerInfo.innerHTML = `
+            <div class="player-name">
+                <span class="pseudo">${player.getPseudo()}</span>
+                <span class="player-type">${player instanceof ComputerPlayer ? 'Bot' : 'Joueur'}</span>
+            </div>
+            <div class="player-score">${score}</div>
+        `;
+    }
+
+    if (!isCurrentPlayer) {
+        playerInfo.insertBefore(cardsSection, playerInfo.querySelector('.player-score'));
+    }
+
+    return playerInfo;
+}
+
+renderPlayersList() {
+    const activeListEl = document.getElementById('active-player-list');
+    const inactiveListEl = document.getElementById('inactive-player-list');
+
+    activeListEl.innerHTML = '';
+    inactiveListEl.innerHTML = '';
+
+    for (const player of this.#game.getPlayers()) {
+        const el = this.renderPlayer(player);
+        if (player === this.#game.getCurrentPlayer()) {
+            activeListEl.prepend(el); 
+        } else if (player.getCanPlay()) {
+            activeListEl.appendChild(el);
+        } else {
+            inactiveListEl.appendChild(el);
+        }
     }
 }
+
+    renderNextTurn() {
+
+    }
+
+    renderBustScreen() {
+
+    }
+
+    renderNextPlayer() {
+        const div = document.createElement('div');
+        div.innerHTML = `<p>Au tour de ${this.#game.getCurrentPlayer().getPseudo()}</p>`;
+        div.classList.add('next-player-overlay');
+        document.body.appendChild(div);
+
+        setTimeout(() => {
+            div.remove();
+        }, 2000);
+    }
+
+    renderCurrentPlayer() {
+        let currentPlayer = document.getElementById('current-player');
+        currentPlayer.innerHTML = `<p>Joueur:</p><p id="player-name">${this.#game.getCurrentPlayer().getPseudo()}</p>`;
+    }
+
+    renderEventCardModal(message) {
+
+    }
+
+    renderRoundInfos() {
+
+    }
+
+    renderEndScreen() {
+
+    }
+
+    renderFlip7Event() {
+
+    }
+
+    renderTroisALaSuiteEvent() {
+
+    }
+
+    renderSecondeChance() {
+
+    }
+
+    renderStopEvent() {
+
+    }
+
+    renderChoosePlayerEffect() {
+
+    }
+
+    renderChoosePlayerGiveCard() {
+        
+    }
+
+    renderStatistiques(arrayStats) {
+        const statistiques = document.getElementById('modal-stats');
+        statistiques.innerHTML = "";
+    }
+
+    renderState(message = ""){
+        const state = this.#game.getState();
+        this.#HTML_ELEMENT.currentPlayerEl.textContent = `Joueur actif : ${state.currentPlayerPseudo}`;
+        this.#HTML_ELEMENT.deckCountEl.textContent = `Cartes restantes : ${state.deckCount}`;
+        this.#HTML_ELEMENT.roundEl.textContent = `Round : ${state.round}`;
+        this.#HTML_ELEMENT.scoresEl.textContent = `Scores : ${state.scores.map((score, i) => `${this.#game.getPlayers()[i].getPseudo()}: ${score}`).join(', ')}`;
+        this.#HTML_ELEMENT.messageEl.textContent = message;
+        this.renderDrawPile(this.#game.getDeck());
+        this.renderHand(this.#game.getCurrentPlayer().getHand());
+        this.renderCurrentPlayer();
+        this.renderPlayersList();
+    }
+
+
+    endGame(message){
+        this.#HTML_ELEMENT.messageEl.textContent = message;
+        this.#HTML_ELEMENT.btnTirer.disabled = true;
+        this.#HTML_ELEMENT.btnStop.disabled = true;
+    }
+
+}
+

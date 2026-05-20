@@ -1,5 +1,5 @@
 
-import {Game} from "./Game.js";
+import {Game} from "./game.js";
 import {HumanPlayer} from "./Player.js";
 import {Ui} from "./Ui.js";
 
@@ -18,8 +18,11 @@ document.addEventListener("DOMContentLoaded", function(){
     /** Game view */
 
     let players = [];
+    for(let i = 0; i < 3; i++) {
+        players.push(new HumanPlayer(`Hugo`));
+    }
     let game = null;
-    const ui = new Ui(game);
+    let ui = new Ui(game);
     ui.initTheme();
     ui.initBackground();
     ui.initLogo();
@@ -49,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function(){
     setState(STATES.HOME);
 
     document.body.addEventListener('click', (e) => {
+        if (e.target.closest('.theme-btn')) ui.toggleTheme();
         if (e.target.closest('.btn-rules')) openModal('modal-rules');
         if (e.target.closest('.stats-btn')) openModal('modal-stats');
         if (e.target.closest('.play-btn') && players.length >= 3) {
@@ -58,21 +62,14 @@ document.addEventListener("DOMContentLoaded", function(){
                     return new HumanPlayer(player.pseudo);
             });
             game = new Game(instancedPlayers);
+            ui.setGame(game);
             game.start();
             ui.renderGameHeader();
-            setState(STATES.DEV);
-            renderState("Le jeu commence. Cliquez sur Tirer pour jouer.");
+            setState(STATES.GAME);
+            ui.renderState("Le jeu commence. Cliquez sur Tirer pour jouer.");
         }
         if (e.target.closest('.add-player-btn') && players.length < 5) openModal('modal-add-players');
     });
-
-
-    //TODO: Fonction reset game nécessaire.
-    /** Quit game btn */
-
-/*     document.querySelector('.quit-btn').addEventListener("click", () => {
-
-    }); */
 
 
     document.querySelectorAll('.close-modal').forEach(btn => {
@@ -81,20 +78,42 @@ document.addEventListener("DOMContentLoaded", function(){
         });
     });
 
-    /** Dark light theme */
-    document.querySelector('.secondary-btn').addEventListener('click', () => {
-        ui.toggleTheme();
-    });
 
     /** Add player */
     document.querySelector('form').addEventListener("submit", function(e) {
         e.preventDefault();
         let selectPlayerType = document.querySelector('.type-slider').value;
         let pseudo = document.getElementById('pseudo').value;
+        
         if(players.some(player => player.pseudo === pseudo)) {
             ui.renderError('Pseudo déjà utilisé', 'Ce pseudo est déjà utilisé, trouve en un autre...');
             return;
         }
+
+        if(pseudo.length > 16 || pseudo.length < 2) {
+            ui.renderError('Longueur de pseudo invalide', 'Le pseudo doit faire entre 2 et 16 caractères');
+            return;
+        }
+
+        let regexp = /^_/;
+        if(selectPlayerType === '0' && regexp.test(pseudo)) {
+            ui.renderError("Le caractères '_' est réservé au bot !", 'Le. pseudo d\'un joueur doit obligatoirement commencer par une lettre majuscule.');
+            return;
+        }
+
+        if(selectPlayerType === '1' && selectPlayerType === '2' && regexp.test(pseudo)) {
+            ui.renderError("Oops tu dois laisser le underscore...", "Le pseudo du bot doit commencer par '_'");
+            return;
+        }
+
+
+        regexp = /^_?[A-Z](-?[a-z0-9]+)*$/;
+        if(!regexp.test(pseudo)) {
+            ui.renderError('Caractères invalides !', 'Le pseudo doit commencer par une lettre majuscule, seul les caractères suivants sont autorisés : a-z, A-Z, 0-9, -');
+            return;
+        }
+
+
         if(selectPlayerType === '0') {
             players.push({pseudo: `${pseudo}`, type: "Joueur"});
         } else if(selectPlayerType === '1') {
@@ -130,17 +149,24 @@ document.addEventListener("DOMContentLoaded", function(){
         input.classList.remove('pressed');
     });
 
+
+
     let status = document.getElementById('status');
     let slider = document.querySelector('.type-slider');
+    let inputPseudo = document.getElementById('pseudo');
 
     slider.addEventListener("input", (e) => {
         let selected = e.target.value;
 
         if(selected == 0) {
+            if(inputPseudo.value.startsWith('_')) inputPseudo.value = inputPseudo.value.substring(1);
             status.innerHTML = 'Joueur';
         } else if(selected == 1) {
+            if(!inputPseudo.value.startsWith('_')) inputPseudo.value = '_' + inputPseudo.value;
             status.innerHTML = 'Bot';
+
         } else if(selected == 2) {
+            if(!inputPseudo.value.startsWith('_')) inputPseudo.value = '_' + inputPseudo.value;
             status.innerHTML = 'Bot Hard';
         }
     });
@@ -159,75 +185,50 @@ document.addEventListener("DOMContentLoaded", function(){
         }
     });
 
+    async function getStatistique() {
 
-    const currentPlayerEl = document.getElementById("current-player");
-    const deckCountEl = document.getElementById("deck-count");
-    const roundEl = document.getElementById("round");
-    const scoresEl = document.getElementById("scores");
-    const messageEl = document.getElementById("message");
-    const btnTirer = document.getElementById("btn-tirer");
-    const btnStop = document.getElementById("btn-stoper");
-
-    function renderHand(player){
-        if(player.getHand().length === 0){
-            return;
-        }
-        for (const card of player.getHand()){
-            ui.renderCard(card);
-        }
     }
 
-    function renderState(message = ""){
-        const state = game.getState();
-        currentPlayerEl.textContent = `Joueur actif : ${state.currentPlayerPseudo}`;
-        deckCountEl.textContent = `Cartes restantes : ${state.deckCount}`;
-        roundEl.textContent = `Round : ${state.round}`;
-        scoresEl.textContent = `Scores : ${state.scores.map((score, i) => `${game.getPlayers()[i].getPseudo()}: ${score}`).join(', ')}`;
-        messageEl.textContent = message;
-        renderHand(game.getCurrentPlayer());
-    }
-
-
-    function endGame(message){
-        messageEl.textContent = message;
-        btnTirer.disabled = true;
-        btnStop.disabled = true;
-    }
+    /**
+     * Partie du jeu
+     */
 
     function handleAction(action){
         const result = game.playAction(action);
         switch(result.status){
             case "continue":
-                renderState("Carte tirée. Continuez ou stoppez.");
+                ui.renderState("Carte tirée. Continuez ou stoppez.");
                 break;
             case "flip7":
-                renderState("Flip 7 ! Tour terminé.");
+                ui.renderState("Flip 7 ! Tour terminé.");
                 break;
             case "duplicate":
-                renderState("Carte déjà présente. Tour terminé.");
-                document.getElementById('hand-area').childNodes.forEach(node => { node.remove(); });
+                ui.renderNextPlayer();
+                ui.renderState("Carte déjà présente. Tour terminé.");
+                ui.renderDiscardPile(game.getPile());
                 break;
             case "empty":
-                renderState("Le deck est vide. Deck reshufflé vous pouvez tirer une carte.");           
+                ui.renderState("Le deck est vide. Deck reshufflé vous pouvez tirer une carte.");           
                 break;
             case "stopped":
-                renderState("Tour arrêté. Joueur suivant.");
-                document.getElementById('hand-area').childNodes.forEach(node => { node.remove(); });
+                ui.renderNextPlayer();
+                ui.renderState("Tour arrêté. Joueur suivant.");
+                ui.renderDiscardPile(game.getPile());
                 break;
             default:
-                renderState("");
+                ui.renderState("");
         }
 
         if(game.getState().gameOver){
-            endGame("Le jeu est terminé.");
+            ui.endGame("Le jeu est terminé.");
         }
     }
 
-    btnTirer.addEventListener("click", function(){
+    document.getElementById('hit-btn').addEventListener("click", function(){
         handleAction("T");
     });
 
-    btnStop.addEventListener("click", function(){
+    document.getElementById('stop-btn').addEventListener("click", function(){
         handleAction("S");
     });
 

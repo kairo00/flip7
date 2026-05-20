@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flip 7</title>
     <link href="css/style.css" rel="stylesheet">
-    <script type="module" src="./js/Board.js"></script>
+    <script type="module" src="./js/Main.js"></script>
 </head>
 <body>
 
@@ -22,6 +22,7 @@
                 <path d="M10.2001 20.0133C14.7301 20.0133 18.6501 17.1033 19.9601 12.7733C20.0701 12.4233 19.9701 12.0333 19.7101 11.7733C19.4501 11.5133 19.0701 11.4133 18.7101 11.5233C17.9301 11.7533 17.1301 11.8733 16.3301 11.8733C11.8101 11.8733 8.13006 8.19327 8.13006 3.67327C8.13006 2.87327 8.25006 2.07327 8.48006 1.29327C8.53282 1.11958 8.53742 0.934829 8.49335 0.758738C8.44928 0.582647 8.3582 0.421834 8.22985 0.293479C8.10149 0.165124 7.94068 0.0740469 7.76459 0.0299776C7.5885 -0.0140916 7.40374 -0.009498 7.23006 0.043268C5.13369 0.676313 3.29765 1.96911 1.99501 3.7294C0.692361 5.48968 -0.00730837 7.62342 5.75689e-05 9.81327C5.75689e-05 15.4333 4.58006 20.0133 10.2001 20.0133Z" fill="var(--secondary-btn-color)"/>
                 </svg>
             </button>
+            <button class=" primary-btn play-btn dev">P</button>
         </div>
     </header>
 
@@ -71,7 +72,7 @@
             <button class="primary-btn close-modal" aria-label="fermer">x</button>
             <form id="add-player-form" method="post">
                 <h1 for="pseudo">Ajouter un joueur</h1>
-                <input id="pseudo" type="text" name="pseudo" placeholder="Entrez un pseudo" maxlength="10" required>
+                <input id="pseudo" type="text" name="pseudo" placeholder="Entrez un pseudo" maxlength="16" required>
                 <div id="slider">
                     <input type="range" min="0" max="2" step="1" value="0" class="type-slider">
                     <div class="markers">
@@ -101,10 +102,38 @@
     </section>
 
     <section id="view-game" class="hidden">
+        <div class="top-row">
+            <div id="round-message">
+                <p id="round">Round : </p>
+                <p id="scores">Scores : </p>
+                <p id="message"></p>
+            </div>
+            <div id="players-list">
+                <div id="active-player-list"></div>
+                <div id="inactive-player-list"></div>
+            </div>
+            <div id="dd-container">
+                <div id="draw-container"></div>
+                <div id="discard-container"></div>
+            </div>
+        </div>
+        <div id="hand-area">
+            <div id="bonus-card-container"></div>
+            <div id="special-number-card">
+                <div id="number-card-container"></div>
+                <div id="special-card-container"></div>
+            </div>
+        </div>
+
         <div id="action-container">
-            <svg class="arch" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 141" fill="none" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M-1.31135e-05 136.484C-0.000122476 88.7447 -0.000177157 64.8752 14.6017 49.5274C29.2036 34.1796 53.0434 32.9913 100.723 30.6148L714.952 0L1339.2 30.6811C1386.92 33.0261 1410.77 34.1986 1425.39 49.549C1440 64.8994 1440 88.784 1440 136.553L1440 142.208H0L-1.31135e-05 136.484Z" fill="#02090E"/>
+            <svg class="arch" xmlns="http://www.w3.org/2000/svg" width="100%" height="141" viewBox="0 0 1440 141" fill="none" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M-1.31135e-05 136.484C-0.000122476 88.7447 -0.000177157 64.8752 14.6017 49.5274C29.2036 34.1796 53.0434 32.9913 100.723 30.6148L714.952 0L1339.2 30.6811C1386.92 33.0261 1410.77 34.1986 1425.39 49.549C1440 64.8994 1440 88.784 1440 136.553L1440 142.208H0L-1.31135e-05 136.484Z" fill="var(--element-bg)"/>
             </svg>
+            <div class="buttons-game">
+                <button class="primary-btn" id="stop-btn">Stopper</button>
+                <button class="primary-btn" id="hit-btn">Tirer</button>
+            </div>
+            <div id="current-player"></div>
         </div>
     </section>
 
