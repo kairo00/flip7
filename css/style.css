@@ -723,7 +723,7 @@ button:hover {
 }
 
 input[type=text] {
-    padding: 0.5em 0em;
+    padding: 0.5em 1em;
     text-align: center;
     font-size: 1.4rem;
     font-weight: 500;
@@ -1406,6 +1406,8 @@ input[type=text]:active {
 .stats-record {
     width: 80%;
     background: var(--primary-btn-bg);
+    border: 0.2rem solid var(--current-player-border);
+    box-shadow: 0.2em 0.2em 0 0 var(--current-player-shadow);
     display: flex;
     flex-direction: column;
     align-items: center;

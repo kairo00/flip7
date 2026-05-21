@@ -14,9 +14,13 @@ const DICTIONNAIRE_FICHIERS_CARTES = {
     'STOP': 'stop'
 };
 
+/**
+ * Gestion de l'interface graphique (DOM) et des états visuels
+ */
 export class Ui {
 
     #game
+    #audio = null
 
     #HTML_ELEMENT = {
         currentPlayerEl: document.getElementById("current-player"),
@@ -50,30 +54,34 @@ export class Ui {
         });
     }
 
-#ICONS = {
-    sun: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 12C17 13.3261 16.4732 14.5979 15.5355 15.5355C14.5979 16.4732 13.3261 17 12 17C10.6739 17 9.40215 16.4732 8.46447 15.5355C7.52678 14.5979 7 13.3261 7 12C7 10.6739 7.52678 9.40215 8.46447 8.46447C9.40215 7.52678 10.6739 7 12 7C13.3261 7 14.5979 7.52678 15.5355 8.46447C16.4732 9.40215 17 10.6739 17 12Z" fill="var(--secondary-btn-color)"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.25C12.1989 1.25 12.3897 1.32902 12.5303 1.46967C12.671 1.61032 12.75 1.80109 12.75 2V4C12.75 4.19891 12.671 4.38968 12.5303 4.53033C12.3897 4.67098 12.1989 4.75 12 4.75C11.8011 4.75 11.6103 4.67098 11.4697 4.53033C11.329 4.38968 11.25 4.19891 11.25 4V2C11.25 1.80109 11.329 1.61032 11.4697 1.46967C11.6103 1.32902 11.8011 1.25 12 1.25ZM3.669 3.716C3.7355 3.64328 3.81567 3.58438 3.90494 3.54266C3.99421 3.50094 4.09082 3.47722 4.18926 3.47286C4.2877 3.46849 4.38604 3.48357 4.47865 3.51722C4.57126 3.55088 4.65633 3.60245 4.729 3.669L6.95 5.7C7.02421 5.76604 7.08457 5.84616 7.12756 5.93571C7.17056 6.02527 7.19533 6.12247 7.20045 6.22168C7.20557 6.32089 7.19092 6.42012 7.15737 6.51362C7.12382 6.60713 7.07202 6.69303 7.00499 6.76635C6.93797 6.83967 6.85704 6.89895 6.76692 6.94073C6.67679 6.98252 6.57926 7.00598 6.48 7.00976C6.38073 7.01354 6.2817 6.99757 6.18865 6.96276C6.09561 6.92795 6.01041 6.87501 5.938 6.807L3.716 4.776C3.64328 4.7095 3.58438 4.62933 3.54266 4.54006C3.50094 4.45079 3.47722 4.35418 3.47286 4.25574C3.46849 4.1573 3.48357 4.05896 3.51722 3.96635C3.55088 3.87374 3.60245 3.78867 3.669 3.716ZM20.331 3.716C20.3975 3.78867 20.4491 3.87374 20.4828 3.96635C20.5164 4.05896 20.5315 4.1573 20.5271 4.25574C20.5228 4.35418 20.4991 4.45079 20.4573 4.54006C20.4156 4.62933 20.3567 4.7095 20.284 4.776L18.062 6.807C17.9147 6.93806 17.7217 7.00585 17.5248 6.9957C17.3279 6.98554 17.1429 6.89826 17.0099 6.75274C16.8769 6.60722 16.8065 6.41516 16.814 6.21814C16.8215 6.02112 16.9063 5.83498 17.05 5.7L19.272 3.669C19.3447 3.60245 19.4297 3.55088 19.5224 3.51722C19.615 3.48357 19.7133 3.46849 19.8117 3.47286C19.9102 3.47722 20.0068 3.50094 20.0961 3.54266C20.1853 3.58438 20.2655 3.64328 20.332 3.716M1.25 12C1.25 11.8011 1.32902 11.6103 1.46967 11.4697C1.61032 11.329 1.80109 11.25 2 11.25H4C4.19891 11.25 4.38968 11.329 4.53033 11.4697C4.67098 11.6103 4.75 11.8011 4.75 12C4.75 12.1989 4.67098 12.3897 4.53033 12.5303C4.38968 12.671 4.19891 12.75 4 12.75H2C1.80109 12.75 1.61032 12.671 1.46967 12.5303C1.32902 12.3897 1.25 12.1989 1.25 12ZM19.25 12C19.25 11.8011 19.329 11.6103 19.4697 11.4697C19.6103 11.329 19.8011 11.25 20 11.25H22C22.1989 11.25 22.3897 11.329 22.5303 11.4697C22.671 11.6103 22.75 11.8011 22.75 12C22.75 12.1989 22.671 12.3897 22.5303 12.5303C22.3897 12.671 22.1989 12.75 22 12.75H20C19.8011 12.75 19.6103 12.671 19.4697 12.5303C19.329 12.3897 19.25 12.1989 19.25 12ZM17.026 17.025C17.1666 16.8845 17.3572 16.8057 17.556 16.8057C17.7548 16.8057 17.9454 16.8845 18.086 17.025L20.308 19.248C20.4405 19.3902 20.5126 19.5782 20.5092 19.7725C20.5057 19.9668 20.427 20.1522 20.2896 20.2896C20.1522 20.427 19.9668 20.5057 19.7725 20.5092C19.5782 20.5126 19.3902 20.4405 19.248 20.308L17.026 18.086C16.8855 17.9454 16.8067 17.7548 16.8067 17.556C16.8067 17.3572 16.8855 17.1656 17.026 17.025ZM6.975 17.026C7.04469 17.0956 7.09998 17.1784 7.1377 17.2694C7.17542 17.3604 7.19484 17.458 7.19484 17.5565C7.19484 17.655 7.17542 17.7526 7.1377 17.8436C7.09998 17.9347 7.04469 18.0173 6.975 18.087L4.752 20.309C4.60982 20.4415 4.42178 20.5136 4.22748 20.5102C4.03318 20.5067 3.84779 20.428 3.71038 20.2906C3.57297 20.1532 3.49425 19.9678 3.49082 19.7735C3.4874 19.5792 3.55952 19.3912 3.692 19.249L5.914 17.026C6.05463 16.8855 6.24525 16.8067 6.444 16.8067C6.64275 16.8067 6.83437 16.8855 6.975 17.026ZM12 19.25C12.1989 19.25 12.3897 19.329 12.5303 19.4697C12.671 19.6103 12.75 19.8011 12.75 20V22C12.75 22.1989 12.671 22.3897 12.5303 22.5303C12.3897 22.671 12.1989 22.75 12 22.75C11.8011 22.75 11.6103 22.671 11.4697 22.5303C11.329 22.3897 11.25 22.1989 11.25 22V20C11.25 19.8011 11.329 19.6103 11.4697 19.4697C11.6103 19.329 11.8011 19.25 12 19.25Z" fill="var(--secondary-btn-color)"/></svg>`,
+    #ICONS = {
+        sun: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17 12C17 13.3261 16.4732 14.5979 15.5355 15.5355C14.5979 16.4732 13.3261 17 12 17C10.6739 17 9.40215 16.4732 8.46447 15.5355C7.52678 14.5979 7 13.3261 7 12C7 10.6739 7.52678 9.40215 8.46447 8.46447C9.40215 7.52678 10.6739 7 12 7C13.3261 7 14.5979 7.52678 15.5355 8.46447C16.4732 9.40215 17 10.6739 17 12Z" fill="var(--secondary-btn-color)"/><path fill-rule="evenodd" clip-rule="evenodd" d="M12 1.25C12.1989 1.25 12.3897 1.32902 12.5303 1.46967C12.671 1.61032 12.75 1.80109 12.75 2V4C12.75 4.19891 12.671 4.38968 12.5303 4.53033C12.3897 4.67098 12.1989 4.75 12 4.75C11.8011 4.75 11.6103 4.67098 11.4697 4.53033C11.329 4.38968 11.25 4.19891 11.25 4V2C11.25 1.80109 11.329 1.61032 11.4697 1.46967C11.6103 1.32902 11.8011 1.25 12 1.25ZM3.669 3.716C3.7355 3.64328 3.81567 3.58438 3.90494 3.54266C3.99421 3.50094 4.09082 3.47722 4.18926 3.47286C4.2877 3.46849 4.38604 3.48357 4.47865 3.51722C4.57126 3.55088 4.65633 3.60245 4.729 3.669L6.95 5.7C7.02421 5.76604 7.08457 5.84616 7.12756 5.93571C7.17056 6.02527 7.19533 6.12247 7.20045 6.22168C7.20557 6.32089 7.19092 6.42012 7.15737 6.51362C7.12382 6.60713 7.07202 6.69303 7.00499 6.76635C6.93797 6.83967 6.85704 6.89895 6.76692 6.94073C6.67679 6.98252 6.57926 7.00598 6.48 7.00976C6.38073 7.01354 6.2817 6.99757 6.18865 6.96276C6.09561 6.92795 6.01041 6.87501 5.938 6.807L3.716 4.776C3.64328 4.7095 3.58438 4.62933 3.54266 4.54006C3.50094 4.45079 3.47722 4.35418 3.47286 4.25574C3.46849 4.1573 3.48357 4.05896 3.51722 3.96635C3.55088 3.87374 3.60245 3.78867 3.669 3.716ZM20.331 3.716C20.3975 3.78867 20.4491 3.87374 20.4828 3.96635C20.5164 4.05896 20.5315 4.1573 20.5271 4.25574C20.5228 4.35418 20.4991 4.45079 20.4573 4.54006C20.4156 4.62933 20.3567 4.7095 20.284 4.776L18.062 6.807C17.9147 6.93806 17.7217 7.00585 17.5248 6.9957C17.3279 6.98554 17.1429 6.89826 17.0099 6.75274C16.8769 6.60722 16.8065 6.41516 16.814 6.21814C16.8215 6.02112 16.9063 5.83498 17.05 5.7L19.272 3.669C19.3447 3.60245 19.4297 3.55088 19.5224 3.51722C19.615 3.48357 19.7133 3.46849 19.8117 3.47286C19.9102 3.47722 20.0068 3.50094 20.0961 3.54266C20.1853 3.58438 20.2655 3.64328 20.332 3.716M1.25 12C1.25 11.8011 1.32902 11.6103 1.46967 11.4697C1.61032 11.329 1.80109 11.25 2 11.25H4C4.19891 11.25 4.38968 11.329 4.53033 11.4697C4.67098 11.6103 4.75 11.8011 4.75 12C4.75 12.1989 4.67098 12.3897 4.53033 12.5303C4.38968 12.671 4.19891 12.75 4 12.75H2C1.80109 12.75 1.61032 12.671 1.46967 12.5303C1.32902 12.3897 1.25 12.1989 1.25 12ZM19.25 12C19.25 11.8011 19.329 11.6103 19.4697 11.4697C19.6103 11.329 19.8011 11.25 20 11.25H22C22.1989 11.25 22.3897 11.329 22.5303 11.4697C22.671 11.6103 22.75 11.8011 22.75 12C22.75 12.1989 22.671 12.3897 22.5303 12.5303C22.3897 12.671 22.1989 12.75 22 12.75H20C19.8011 12.75 19.6103 12.671 19.4697 12.5303C19.329 12.3897 19.25 12.1989 19.25 12ZM17.026 17.025C17.1666 16.8845 17.3572 16.8057 17.556 16.8057C17.7548 16.8057 17.9454 16.8845 18.086 17.025L20.308 19.248C20.4405 19.3902 20.5126 19.5782 20.5092 19.7725C20.5057 19.9668 20.427 20.1522 20.2896 20.2896C20.1522 20.427 19.9668 20.5057 19.7725 20.5092C19.5782 20.5126 19.3902 20.4405 19.248 20.308L17.026 18.086C16.8855 17.9454 16.8067 17.7548 16.8067 17.556C16.8067 17.3572 16.8855 17.1656 17.026 17.025ZM6.975 17.026C7.04469 17.0956 7.09998 17.1784 7.1377 17.2694C7.17542 17.3604 7.19484 17.458 7.19484 17.5565C7.19484 17.655 7.17542 17.7526 7.1377 17.8436C7.09998 17.9347 7.04469 18.0173 6.975 18.087L4.752 20.309C4.60982 20.4415 4.42178 20.5136 4.22748 20.5102C4.03318 20.5067 3.84779 20.428 3.71038 20.2906C3.57297 20.1532 3.49425 19.9678 3.49082 19.7735C3.4874 19.5792 3.55952 19.3912 3.692 19.249L5.914 17.026C6.05463 16.8855 6.24525 16.8067 6.444 16.8067C6.64275 16.8067 6.83437 16.8855 6.975 17.026ZM12 19.25C12.1989 19.25 12.3897 19.329 12.5303 19.4697C12.671 19.6103 12.75 19.8011 12.75 20V22C12.75 22.1989 12.671 22.3897 12.5303 22.5303C12.3897 22.671 12.1989 22.75 12 22.75C11.8011 22.75 11.6103 22.671 11.4697 22.5303C11.329 22.3897 11.25 22.1989 11.25 22V20C11.25 19.8011 11.329 19.6103 11.4697 19.4697C11.6103 19.329 11.8011 19.25 12 19.25Z" fill="var(--secondary-btn-color)"/></svg>`,
 
-    moon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 21" fill="none"><path d="M10.2001 20.0133C14.7301 20.0133 18.6501 17.1033 19.9601 12.7733C20.0701 12.4233 19.9701 12.0333 19.7101 11.7733C19.4501 11.5133 19.0701 11.4133 18.7101 11.5233C17.9301 11.7533 17.1301 11.8733 16.3301 11.8733C11.8101 11.8733 8.13006 8.19327 8.13006 3.67327C8.13006 2.87327 8.25006 2.07327 8.48006 1.29327C8.53282 1.11958 8.53742 0.934829 8.49335 0.758738C8.44928 0.582647 8.3582 0.421834 8.22985 0.293479C8.10149 0.165124 7.94068 0.0740469 7.76459 0.0299776C7.5885 -0.0140916 7.40374 -0.009498 7.23006 0.043268C5.13369 0.676313 3.29765 1.96911 1.99501 3.7294C0.692361 5.48968 -0.00730837 7.62342 5.75689e-05 9.81327C5.75689e-05 15.4333 4.58006 20.0133 10.2001 20.0133Z" fill="var(--secondary-btn-color)"/></svg>`
-}
+        moon: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 21" fill="none"><path d="M10.2001 20.0133C14.7301 20.0133 18.6501 17.1033 19.9601 12.7733C20.0701 12.4233 19.9701 12.0333 19.7101 11.7733C19.4501 11.5133 19.0701 11.4133 18.7101 11.5233C17.9301 11.7533 17.1301 11.8733 16.3301 11.8733C11.8101 11.8733 8.13006 8.19327 8.13006 3.67327C8.13006 2.87327 8.25006 2.07327 8.48006 1.29327C8.53282 1.11958 8.53742 0.934829 8.49335 0.758738C8.44928 0.582647 8.3582 0.421834 8.22985 0.293479C8.10149 0.165124 7.94068 0.0740469 7.76459 0.0299776C7.5885 -0.0140916 7.40374 -0.009498 7.23006 0.043268C5.13369 0.676313 3.29765 1.96911 1.99501 3.7294C0.692361 5.48968 -0.00730837 7.62342 5.75689e-05 9.81327C5.75689e-05 15.4333 4.58006 20.0133 10.2001 20.0133Z" fill="var(--secondary-btn-color)"/></svg>`,
 
-toggleTheme() {
-    document.documentElement.classList.toggle('dark');
-    const isDark = document.documentElement.classList.contains('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    this.#updateThemeIcon(isDark);
-}
+        soundOn: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2V15H6L11 19V5Z" stroke="var(--secondary-btn-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19.07 4.93C20.9447 6.80528 21.9979 9.34836 21.9979 12C21.9979 14.6516 20.9447 17.1947 19.07 19.07M15.54 8.46C16.4774 9.39764 17.004 10.6692 17.004 11.995C17.004 13.3208 16.4774 14.5924 15.54 15.53" stroke="var(--secondary-btn-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
 
-initTheme() {
-    const isDark = localStorage.getItem('theme') === 'dark';
-    if (isDark) document.documentElement.classList.add('dark');
-    this.#updateThemeIcon(isDark);
-}
+        soundOff: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M11 5L6 9H2V15H6L11 19V5Z" stroke="var(--secondary-btn-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="23" y1="9" x2="17" y2="15" stroke="var(--secondary-btn-color)" stroke-width="2" stroke-linecap="round"/><line x1="17" y1="9" x2="23" y2="15" stroke="var(--secondary-btn-color)" stroke-width="2" stroke-linecap="round"/></svg>`
+    }
 
-#updateThemeIcon(isDark) {
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-        btn.innerHTML = isDark ? this.#ICONS.sun : this.#ICONS.moon;
-    });
-}
+    toggleTheme() {
+        document.documentElement.classList.toggle('dark');
+        const isDark = document.documentElement.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        this.#updateThemeIcon(isDark);
+    }
+
+    initTheme() {
+        const isDark = localStorage.getItem('theme') === 'dark';
+        if (isDark) document.documentElement.classList.add('dark');
+        this.#updateThemeIcon(isDark);
+    }
+
+    #updateThemeIcon(isDark) {
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.innerHTML = isDark ? this.#ICONS.sun : this.#ICONS.moon;
+        });
+    }
 
     initBackground() {
         fetch('assets/images/bg-pattern.svg')
@@ -124,6 +132,26 @@ initTheme() {
         `;
     }
 
+    initSound(audio) {
+        this.#audio = audio;
+        const isMuted = localStorage.getItem('soundMuted') !== 'false';
+        this.#audio.muted = isMuted;
+        this.#updateSoundIcon(isMuted);
+    }
+
+    toggleSound() {
+        this.#audio.muted = !this.#audio.muted;
+        const isMuted = this.#audio.muted;
+        localStorage.setItem('soundMuted', isMuted);
+        this.#updateSoundIcon(isMuted);
+    }
+
+    #updateSoundIcon(isMuted) {
+        document.querySelectorAll('.sound-btn').forEach(btn => {
+            btn.innerHTML = isMuted ? this.#ICONS.soundOff : this.#ICONS.soundOn;
+        });
+    }
+
 
     renderWaitroom(players) {
         const typeAffichage = {
@@ -164,7 +192,7 @@ initTheme() {
             divError.classList.add('slide-out-left');
             setTimeout(() => {
                 divError.remove();
-            }, 400); 
+            }, 400);
         }, 3000);
     }
 
@@ -183,17 +211,17 @@ initTheme() {
         imgCard.className = className;
         imgCard.src = this.getCardFileName(card, isFaceUp);
 
-        imgCard.dataset.value = isFaceUp ? (card instanceof NumberCard ? card.getNumero() : card.getNom()): "back-card";
+        imgCard.dataset.value = isFaceUp ? (card instanceof NumberCard ? card.getNumero() : card.getNom()) : "back-card";
 
         return imgCard;
 
     }
 
     getCardFileName(card, isFaceUp) {
-        if(!isFaceUp) {
+        if (!isFaceUp) {
             return "assets/sprites/back.webp";
         }
-        if(card instanceof NumberCard) {
+        if (card instanceof NumberCard) {
             return `assets/sprites/${card.getNumero()}.webp`;
         }
         return `assets/sprites/${DICTIONNAIRE_FICHIERS_CARTES[card.getNom()]}.webp`;
@@ -205,6 +233,10 @@ initTheme() {
         document.getElementById('bonus-card-container').innerHTML = '';
     }
 
+    /**
+     * Affiche la main d'un joueur à l'écran
+     * @param {Player} player - Le joueur dont on affiche les cartes
+     */
     renderHand(player) {
         this.clearHand();
         const tableauCartes = player.getHand();
@@ -225,9 +257,9 @@ initTheme() {
 
         for (let card of tableauCartes) {
             let imgCard = this.createCard(card, true, 'hand-card');
-            if(card instanceof NumberCard) {
+            if (card instanceof NumberCard) {
                 const randomAngle = Math.floor(Math.random() * 10) - 5;
-                const randomPosY = Math.floor(Math.random() * 6) -3;
+                const randomPosY = Math.floor(Math.random() * 6) - 3;
                 imgCard.classList.add('number-card');
                 imgCard.style.transform = `rotate(${randomAngle}deg) translateY(${randomPosY}px)`;
 
@@ -236,10 +268,10 @@ initTheme() {
                 }
 
                 containerNumber.appendChild(imgCard);
-            } else if(card instanceof SpecialCard) {
+            } else if (card instanceof SpecialCard) {
                 imgCard.classList.add('special-card');
                 containerSpecial.appendChild(imgCard);
-            } else if(card instanceof BonusCard) {
+            } else if (card instanceof BonusCard) {
                 imgCard.classList.add('bonus-card');
                 containerBonus.appendChild(imgCard);
             }
@@ -255,7 +287,7 @@ initTheme() {
         this.clearDraw();
         const drawContainer = document.getElementById('draw-container');
 
-        if(deck.length === 0) {
+        if (deck.length === 0) {
             drawContainer.innerHTML = '<div id="empty-draw">Pioche vide</div>';
             return;
         }
@@ -266,11 +298,11 @@ initTheme() {
             const cardImg = this.createCard(card, false, 'draw-card');
 
             cardImg.style.position = "absolute";
-            cardImg.style.top = `${-index*2}px`;
-            cardImg.style.left = `${index*1}px`;
+            cardImg.style.top = `${-index * 2}px`;
+            cardImg.style.left = `${index * 1}px`;
 
             drawContainer.appendChild(cardImg);
-        });  
+        });
     }
 
     clearDiscard() {
@@ -282,7 +314,7 @@ initTheme() {
         this.clearDiscard();
         const discardContainer = document.getElementById('discard-container');
 
-        if(pile.length === 0) {
+        if (pile.length === 0) {
             discardContainer.innerHTML = '<div id="empty-discard"><p>Pile vide</p></div>';
             return;
         }
@@ -293,13 +325,13 @@ initTheme() {
             const cardImg = this.createCard(card, true, 'discard-card');
 
             cardImg.style.position = "absolute";
-            cardImg.style.top = `${-index*2}px`;
-            cardImg.style.left = `${index*1}px`;
+            cardImg.style.top = `${-index * 2}px`;
+            cardImg.style.left = `${index * 1}px`;
             const randomAngle = Math.floor(Math.random() * 10) - 5;
             cardImg.style.transform = `rotate(${randomAngle}deg)`;
 
             discardContainer.appendChild(cardImg);
-        });  
+        });
     }
 
     renderPlayer(player) {
@@ -323,7 +355,7 @@ initTheme() {
                 <div class="player-body">
                     <div class="player-name">
                         <span class="pseudo">${player.getPseudo()}</span>
-                        <span class="player-type">${player instanceof ComputerPlayer ? 'Bot' : 'Joueur'}</span>
+                        <span class="player-type">${player instanceof ComputerPlayer ? (player.getNiveau() === 1 ? 'Bot' : 'Bot difficile') : 'Joueur'}</span>
                     </div>
                 </div>
                 <div class="player-score">${score}</div>
@@ -337,7 +369,7 @@ initTheme() {
                 <div class="player-body">
                     <div class="player-name">
                         <span class="pseudo">${player.getPseudo()}</span>
-                        <span class="player-type">${player instanceof ComputerPlayer ? 'Bot' : 'Joueur'}</span>
+                        <span class="player-type">${player instanceof ComputerPlayer ? (player.getNiveau() === 1 ? 'Bot' : 'Bot difficile') : 'Joueur'}</span>
                     </div>
                 </div>
                 ${scoreInfo}
@@ -348,7 +380,7 @@ initTheme() {
                 <div class="player-body">
                     <div class="player-name">
                         <span class="pseudo">${player.getPseudo()}</span>
-                        <span class="player-type">${player instanceof ComputerPlayer ? 'Bot' : 'Joueur'}</span>
+                        <span class="player-type">${player instanceof ComputerPlayer ? (player.getNiveau() === 1 ? 'Bot' : 'Bot difficile') : 'Joueur'}</span>
                     </div>
                 </div>
                 <div class="player-score">${score}</div>
@@ -374,7 +406,7 @@ initTheme() {
         for (const player of this.#game.getPlayers()) {
             const el = this.renderPlayer(player);
             if (player === this.#game.getCurrentPlayer()) {
-                currentListEl.prepend(el); 
+                currentListEl.prepend(el);
             } else if (player.getCanPlay()) {
                 activeListEl.appendChild(el);
             } else {
@@ -391,7 +423,7 @@ initTheme() {
     renderEventCardModal(message, couleurTexte = "var(--text-player)") {
         const div = document.createElement('div');
         div.classList.add('next-player-overlay');
-        
+
         div.innerHTML = `<p style="color: ${couleurTexte}; text-align: center;">${message}</p>`;
         document.body.appendChild(div);
 
@@ -456,7 +488,7 @@ initTheme() {
         this.renderMinorEvent(`STOP !<br>${texte}`, "#FF9DEC");
     }
 
-    
+
     renderStatistiques(arrayStats) {
         const statsModal = document.getElementById('modal-stats');
         if (!statsModal) return;
@@ -478,7 +510,7 @@ initTheme() {
             html = `<p class="stats-empty-msg">Aucune donnée disponible.</p>`;
         } else {
             const maxPoints = arrayStats.find(s => s.type === 'max_points');
-            const nbGames   = arrayStats.find(s => s.type === 'nbgames');
+            const nbGames = arrayStats.find(s => s.type === 'nbgames');
 
             if (maxPoints) {
                 html += `
@@ -591,7 +623,7 @@ initTheme() {
         this.renderPlayersList();
     }
 
-    renderState(message = ""){
+    renderState(message = "") {
         const state = this.#game.getState();
         this.#HTML_ELEMENT.roundEl.textContent = `Manche ${state.round}`;
         this.#HTML_ELEMENT.messageEl.textContent = message;
@@ -603,7 +635,7 @@ initTheme() {
     }
 
 
-    endGame(message){
+    endGame(message) {
         this.#HTML_ELEMENT.messageEl.textContent = message;
         this.#HTML_ELEMENT.btnTirer.disabled = true;
         this.#HTML_ELEMENT.btnStop.disabled = true;

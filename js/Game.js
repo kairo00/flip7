@@ -1,14 +1,11 @@
-<<<<<<< HEAD
 import { Card, NumberCard, BonusCard, SpecialCard } from "./Card.js";
 
+/**
+ * Logique principale et gestion de l'état du jeu Flip7
+ */
 export class Game {
     MAX_PLAYERS_LIMIT = 5;
     MIN_PLAYERS_LIMIT = 2;
-=======
-import { Cards, NumberCard, BonusCard, SpecialCard } from "./Cards.js";
-
-export class Board {
->>>>>>> origin/develop
     #players;
     #scores;
     #deck;
@@ -54,7 +51,7 @@ export class Board {
         deck.push(new BonusCard(10, '+'));
 
         //cartes speciales
-        for(let i = 0; i < 3; i++){
+        for (let i = 0; i < 3; i++) {
             deck.push(new SpecialCard('SECONDECHANCE'));
             deck.push(new SpecialCard('STOP'));
             deck.push(new SpecialCard('TROISALASUITE'));
@@ -81,7 +78,6 @@ export class Board {
 
     }
 
-<<<<<<< HEAD
     replacePlayer(oldPlayer, newPlayer) {
         const index = this.#players.indexOf(oldPlayer);
         if (index === -1) return false;
@@ -94,8 +90,6 @@ export class Board {
         return true;
     }
 
-=======
->>>>>>> origin/develop
     resetRound() {
         this.#round += 1;
         console.log(`Début du round ${this.#round}`);
@@ -145,7 +139,6 @@ export class Board {
         return this.#deck.length;
     }
 
-<<<<<<< HEAD
     getDeck() {
         return [...this.#deck];
     }
@@ -154,8 +147,6 @@ export class Board {
         return [...this.#pile];
     }
 
-=======
->>>>>>> origin/develop
     getState() {
         return {
             players: this.#players.map(player => ({
@@ -170,7 +161,7 @@ export class Board {
             deckCount: this.getDeckCount(),
             pile: [...this.#pile],
             gameOver: this.#checkWin(),
-            playerWin : this.getWinner()
+            playerWin: this.getWinner()
         };
     }
 
@@ -193,51 +184,6 @@ export class Board {
         player.setHand(v);
     }
 
-<<<<<<< HEAD
-=======
-
-    async #askPlayerToSelectTarget(playerlist) {
-        if (this.getCurrentPlayer().constructor.name === "ComputerPlayer") {
-            
-            const randomIndex = await this.getCurrentPlayer().getIndexPlayerList(playerlist);
-            return playerlist[randomIndex];
-        }
-        return new Promise((resolve) => {
-            let divselector = document.createElement('div');
-            divselector.id = 'nomHugoLeBossSelect';
-            let selector = document.createElement('select');
-            selector.id = 'selector';
-
-            let option = document.createElement('option');
-            option.value = '';
-            option.disabled = true;
-            option.selected = true;
-            option.text = 'Choisissez un joueur';
-            selector.appendChild(option);
-            
-            let playerDict = {};
-            for (let i = 0; i < playerlist.length; i++) {
-                playerDict[playerlist[i].getPseudo()] = playerlist[i];
-                option = document.createElement('option');
-                option.value = playerlist[i].getPseudo();
-                option.text = playerlist[i].getPseudo();
-                selector.appendChild(option);
-            }
-
-            divselector.appendChild(selector);
-            document.body.appendChild(divselector);
-
-            selector.addEventListener('change', function () {
-                if (this.value !== '') {
-                    const selectedPlayer = playerDict[this.value];
-                    document.body.removeChild(divselector);
-                    resolve(selectedPlayer);
-                }
-            });
-        });
-    }
-
->>>>>>> origin/develop
     checkCanPlayAll() {
         for (const player of this.#players) {
             if (player.getCanPlay()) {
@@ -247,11 +193,7 @@ export class Board {
         return false;
     }
 
-<<<<<<< HEAD
     async #applySpecialCardEffect(card, status, triggeringPlayer, renderHandCallback, selectPlayerCallBack, forceOther = false) {
-=======
-    async #applySpecialCardEffect(card, status, triggeringPlayer, renderHandCallback, forceOther = false) {
->>>>>>> origin/develop
         if (status === 'stopCard') {
             let playerlist = this.#players.filter(p => p.getCanPlay());
             if (forceOther) {
@@ -266,25 +208,15 @@ export class Board {
             } else if (playerlist.length === 1) {
                 selectedPlayer = playerlist[0];
             } else {
-<<<<<<< HEAD
                 selectedPlayer = await selectPlayerCallBack(playerlist, triggeringPlayer);
-=======
-                selectedPlayer = await this.#askPlayerToSelectTarget(playerlist);
->>>>>>> origin/develop
             }
 
             selectedPlayer.setCanPlay(false);
             this.#pile.push(card);
             this.removeCard(triggeringPlayer, new SpecialCard('STOP'));
-<<<<<<< HEAD
             if (renderHandCallback) renderHandCallback();
             return { status: 'stopCard', card, playergivencard: selectedPlayer };
 
-=======
-            if (renderHandCallback) renderHandCallback(triggeringPlayer);
-            if (renderHandCallback) renderHandCallback(selectedPlayer);
-            return { status: 'stopCard', card, playergivencard: selectedPlayer };
->>>>>>> origin/develop
         } else if (status === 'secondChanceCard') {
             let playerlist = this.#players.filter(p => p.getCanPlay());
             if (forceOther) {
@@ -300,19 +232,11 @@ export class Board {
             if (playerlist.length === 1) {
                 selectedPlayer = playerlist[0];
             } else {
-<<<<<<< HEAD
                 selectedPlayer = await selectPlayerCallBack(playerlist, triggeringPlayer);
             }
 
             selectedPlayer.getHand().push(card);
             if (renderHandCallback) renderHandCallback();
-=======
-                selectedPlayer = await this.#askPlayerToSelectTarget(playerlist);
-            }
-
-            selectedPlayer.getHand().push(card);
-            if (renderHandCallback) renderHandCallback(selectedPlayer);
->>>>>>> origin/develop
             return { status: 'givencard', card, player: selectedPlayer };
 
         } else if (status === 'duplicateSpeciale') {
@@ -326,7 +250,6 @@ export class Board {
                 return { status: 'givencard', card, player: "Pile" };
             } else if (playerlist.length === 1) {
                 playerlist[0].getHand().push(card);
-<<<<<<< HEAD
                 if (renderHandCallback) renderHandCallback();
                 return { status: 'givencard', card, player: playerlist[0] };
             } else {
@@ -336,19 +259,7 @@ export class Board {
                 return { status: 'givencard', card, player: selectedPlayer };
             }
         } else if (status === 'troisAlaSuite') {
-            if(renderHandCallback) renderHandCallback();
-=======
-                if (renderHandCallback) renderHandCallback(playerlist[0]);
-                return { status: 'givencard', card, player: playerlist[0] };
-            } else {
-                const selectedPlayer = await this.#askPlayerToSelectTarget(playerlist);
-                selectedPlayer.getHand().push(card);
-                if (renderHandCallback) renderHandCallback(selectedPlayer);
-                return { status: 'givencard', card, player: selectedPlayer };
-            }
-        } else if (status === 'troisAlaSuite') {
-            if(renderHandCallback) renderHandCallback(triggeringPlayer);
->>>>>>> origin/develop
+            if (renderHandCallback) renderHandCallback();
             let playerlist = this.#players.filter(p => p.getCanPlay());
             if (forceOther) {
                 playerlist = playerlist.filter(p => p !== triggeringPlayer);
@@ -362,20 +273,12 @@ export class Board {
             } else if (playerlist.length === 1) {
                 selectedPlayer = playerlist[0];
             } else {
-<<<<<<< HEAD
                 selectedPlayer = await selectPlayerCallBack(playerlist, triggeringPlayer);
-=======
-                selectedPlayer = await this.#askPlayerToSelectTarget(playerlist);
->>>>>>> origin/develop
             }
 
             this.removeCard(triggeringPlayer, new SpecialCard('TROISALASUITE'));
             this.#pile.push(card);
-<<<<<<< HEAD
             if (renderHandCallback) renderHandCallback();
-=======
-            if (renderHandCallback) renderHandCallback(triggeringPlayer);
->>>>>>> origin/develop
 
             let specialCardsDrawn = [];
             let stopDealing = false;
@@ -389,12 +292,7 @@ export class Board {
                 if (renderHandCallback) renderHandCallback(selectedPlayer);
 
                 if (drawResult.status === 'duplicate') {
-<<<<<<< HEAD
-                    // L'idée du bust : la carte va dans la main du joueur
                     selectedPlayer.getHand().push(drawResult.card);
-=======
-                    this.#pile.push(drawResult.card);
->>>>>>> origin/develop
                     selectedPlayer.setSaute(true);
                     selectedPlayer.setCanPlay(false);
                     stopDealing = true;
@@ -417,22 +315,21 @@ export class Board {
             }
 
             for (const sc of specialCardsDrawn) {
-<<<<<<< HEAD
                 await this.#applySpecialCardEffect(sc.card, sc.status, selectedPlayer, renderHandCallback, selectPlayerCallBack, busted);
-=======
-                await this.#applySpecialCardEffect(sc.card, sc.status, selectedPlayer, renderHandCallback, busted);
->>>>>>> origin/develop
             }
-            
+
             return { status: 'troisAlaSuite', card, player: selectedPlayer, flip7: gotFlip7 };
         }
     }
 
-<<<<<<< HEAD
+    /**
+     * Exécute l'action d'un joueur
+     * @param {string} action - 'T' pour tirer ou 'S' pour s'arrêter
+     * @param {function} renderHandCallback - Fonction de rappel pour mettre à jour l'affichage
+     * @param {function} selectPlayerCallBack - Fonction pour choisir un joueur cible
+     * @returns {object} - Résultat du tour
+     */
     async playAction(action, renderHandCallback, selectPlayerCallBack) {
-=======
-    async playAction(action, renderHandCallback) {
->>>>>>> origin/develop
         const normalized = typeof action === 'string' ? action.toUpperCase() : '';
 
         if (normalized === "T") {
@@ -442,64 +339,29 @@ export class Board {
                 for (const player of this.#players) {
                     player.setCanPlay(false);
                 }
-<<<<<<< HEAD
                 return { status: 'flip7', card: result.card };
             }
 
             if (result.status === 'stopCard' || result.status === 'troisAlaSuite') {
-                if(renderHandCallback) renderHandCallback();
+                if (renderHandCallback) renderHandCallback();
                 const effectResult = await this.#applySpecialCardEffect(result.card, result.status, this.getCurrentPlayer(), renderHandCallback, selectPlayerCallBack);
-                return effectResult; 
-            }
-
-            if (result.status === 'duplicate') {
-                this.getCurrentPlayer().getHand().push(result.card); 
-                this.getCurrentPlayer().setSaute(true);
-                this.getCurrentPlayer().setCanPlay(false);
-                return result;
-=======
-                this.#calculateScores();
-                this.resetRound();
-                return { status: 'flip7' };
-
-            }
-
-            if (result.status === 'stopCard' || result.status === 'troisAlaSuite') {
-                const effectResult = await this.#applySpecialCardEffect(result.card, result.status, this.getCurrentPlayer(), renderHandCallback);
-                
-                if (effectResult.flip7 || !this.checkCanPlayAll()) {
-                    this.#calculateScores();
-                    this.resetRound();
-                    return effectResult.flip7 ? { status: 'flip7' } : { status: 'newRound' };
-                }
-                
-                this.nextPlayer();
                 return effectResult;
             }
 
             if (result.status === 'duplicate') {
-                this.#pile.push(result.card);
+                this.getCurrentPlayer().getHand().push(result.card);
                 this.getCurrentPlayer().setSaute(true);
                 this.getCurrentPlayer().setCanPlay(false);
->>>>>>> origin/develop
+                return result;
             }
 
             if (result.status !== 'continue' && result.status !== 'empty' && result.status !== 'chance' && result.status !== 'givencard' && result.status !== 'duplicateSpeciale' && result.status !== 'secondChanceCard') {
                 this.getCurrentPlayer().setCanPlay(false);
             }
-<<<<<<< HEAD
 
             if (result.status === 'duplicateSpeciale') {
-                if(renderHandCallback) renderHandCallback();
+                if (renderHandCallback) renderHandCallback();
                 let playerlist = [];
-=======
-            if (result.status !== 'empty' && result.status !== 'duplicateSpeciale' && result.status !== 'chance' && result.status !== 'givencard') {
-                this.nextPlayer();
-            }
-            if (result.status === 'duplicateSpeciale') {
-                let playerlist = [];
-
->>>>>>> origin/develop
                 for (const player of this.#players) {
                     if (!this.checkHasCard(player, result.card) && player.getCanPlay()) {
                         playerlist.push(player);
@@ -511,38 +373,21 @@ export class Board {
                         return { status: 'givencard', card: result.card, player: playerlist[0] };
                     }
 
-<<<<<<< HEAD
                     const selectedPlayer = await selectPlayerCallBack(playerlist);
-=======
-                    const selectedPlayer = await this.#askPlayerToSelectTarget(playerlist);
-                    console.log("Selected player: " + selectedPlayer.getPseudo());
->>>>>>> origin/develop
                     selectedPlayer.getHand().push(result.card);
                     return { status: 'givencard', card: result.card, player: selectedPlayer, playergivencard: selectedPlayer };
 
                 } else {
                     this.#pile.push(result.card);
-<<<<<<< HEAD
                     return { status: 'givencard', card: result.card, player: null };
                 }
             }
-=======
-                    return { status: 'givencard', card: result.card, player: "Pile car aucun joueur ne peut la recevoir" };
-                }
-            }
-            if (!this.checkCanPlayAll()) {
-                this.#calculateScores();
-                this.resetRound();
-                return { status: 'newRound' };
-            }
->>>>>>> origin/develop
             console.log(`Après action T - Pile: ${this.#pile.length}, status: ${result.status}`);
             return result;
         }
 
         if (normalized === "S") {
             this.getCurrentPlayer().setCanPlay(false);
-<<<<<<< HEAD
             console.log(`Après action S - Pile: ${this.#pile.length}`);
             return { status: 'stopped' };
         }
@@ -556,19 +401,6 @@ export class Board {
         }
         this.nextPlayer();
         return { status: 'nextPlayer' };
-=======
-            this.nextPlayer();
-            if (!this.checkCanPlayAll()) {
-                this.#calculateScores();
-                this.resetRound();
-                return { status: 'newRound' };
-            }
-            console.log(`Après action S - Pile: ${this.#pile.length}`);
-            return { status: 'stopped' };
-        }
-
-
->>>>>>> origin/develop
     }
 
     #viderDeck(player) {
@@ -578,11 +410,10 @@ export class Board {
         player.setHand([]);
     }
 
+    /**
+     * Calcule et attribue les points en fonction des cartes en main
+     */
     #calculateScores() {
-<<<<<<< HEAD
-        console.log("--- FIN DE MANCHE : CALCUL DES SCORES ET DEFAUSSE ---");
-=======
->>>>>>> origin/develop
         for (let i = 0; i < this.#players.length; i++) {
             const player = this.#players[i];
             let points = 0;
@@ -595,26 +426,16 @@ export class Board {
 
                 for (const card of player.getHand()) {
                     if (card instanceof BonusCard) {
-<<<<<<< HEAD
                         if (card.getOperation() === 'x') {
                             points *= card.getValeur();
-=======
-                        if (card.getCalcule() === 'x') {
-                            points *= card.getNumero();
->>>>>>> origin/develop
                         }
                     }
                 }
 
                 for (const card of player.getHand()) {
                     if (card instanceof BonusCard) {
-<<<<<<< HEAD
                         if (card.getOperation() === '+') {
                             points += card.getValeur();
-=======
-                        if (card.getCalcule() === '+') {
-                            points += card.getNumero();
->>>>>>> origin/develop
                         }
                     }
                 }
@@ -624,20 +445,8 @@ export class Board {
                 this.#scores[i] += points;
             }
 
-            console.log(`${player.getPseudo()} gagne ${points} points. Score total: ${this.#scores[i]}`);
-            
-<<<<<<< HEAD
-            console.log(`Transfert de ${player.getHand().length} cartes du joueur ${player.getPseudo()} vers la défausse.`);
             this.#pile.push(...player.getHand());
         }
-        console.log("Taille totale de la défausse (#pile) après nettoyage :", this.#pile.length);
-=======
-            // Move all cards to pile at the end of round
-            for (const card of player.getHand()) {
-                this.#pile.push(card);
-            }
-        }
->>>>>>> origin/develop
     }
 
     #checkFlip7(player) {
@@ -676,41 +485,27 @@ export class Board {
         const card = this.#deck.pop();
         const player = targetPlayer || this.getCurrentPlayer();
 
-<<<<<<< HEAD
         console.log("Le joueur " + player.getPseudo() + " a tiré la carte : " + card.getNom());
-=======
-        console.log("Le joueur " + player.getPseudo() + " a tiré la carte : " + (card.getNumero() != -1 ? card.getNumero() : "") + " " + card.getNom());
->>>>>>> origin/develop
 
         const result = this.#checkTooMuchCards(player, card);
         if (result === 1) {
             let cards = new SpecialCard('SECONDECHANCE')
             if (this.checkHasCard(player, cards)) {
 
-<<<<<<< HEAD
                 console.log("Le joueur " + player.getPseudo() + " a déjà une carte " + card.getNom() + " dans sa main ! Mais sa carte SECONDECHANCE s'active !");
-=======
-                console.log("Le joueur " + player.getPseudo() + " a déjà une carte " + card.getNumero() + " dans sa main ! Mais sa carte SECONDECHANCE s'active !");
->>>>>>> origin/develop
                 this.removeCard(player, cards);
                 this.#pile.push(cards);
                 this.#pile.push(card);
 
                 return { status: 'chance', card };
             }
-<<<<<<< HEAD
             console.log("Le joueur " + player.getPseudo() + " a déjà une carte " + card.getNom() + " dans sa main !");
-=======
-            console.log("Le joueur " + player.getPseudo() + " a déjà une carte " + card.getNumero() + " dans sa main !");
->>>>>>> origin/develop
             return { status: 'duplicate', card };
         }
         if (result === 2) {
             if (card.getNom() === 'SECONDECHANCE') {
-                // If the player already has a Second Chance card, they must give it to another player still in the round.
                 let playerlist = this.#players.filter(p => p.getCanPlay() && !this.checkHasCard(p, card));
                 if (playerlist.length === 0) {
-                    // No other player can receive it
                     this.#pile.push(card);
                     return { status: 'givencard', card, player: "Pile" };
                 } else if (playerlist.length === 1) {
@@ -750,7 +545,7 @@ export class Board {
             }
         }
 
-        
+
 
         if (this.#checkFlip7(player)) {
             return { status: 'flip7', card };
@@ -758,8 +553,4 @@ export class Board {
 
         return { status: 'continue', card };
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> origin/develop

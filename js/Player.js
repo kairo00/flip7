@@ -63,6 +63,10 @@ export class ComputerPlayer extends Player{
         this.#niveau = niveau;
     }
 
+    getNiveau() {
+        return this.#niveau;
+    }
+
     makeDecision(board){
 
         if(this.#niveau==1){
@@ -160,7 +164,7 @@ export class ComputerPlayer extends Player{
 
             const bustProba= totalInDeck > 0 ? bustCardsInDeck/totalInDeck : 1;
 
-            let risk = 0.58-(currentPoints*0.0065)-(uniqueCount*0.025);
+            let risk = 0.58-(currentPoints*0.0065)-(uniqueCount*0.03);
 
             if(hasSecondChance){
                 risk += 0.15;
